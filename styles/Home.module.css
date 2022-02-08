@@ -1,9 +1,21 @@
-.main {
-  min-height: 100vh;
-  padding: 4rem 0;
-  flex: 1;
+.app {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+}
+
+.header {
+  display: flex;
+  padding: 1rem;
+  border-bottom: 1px solid grey;
+}
+
+.addComponent {
+  margin-left: auto;
+}
+
+.main {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
   align-items: center;
 }
