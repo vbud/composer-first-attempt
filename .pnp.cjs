@@ -42,7 +42,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react", "npm:17.0.39"],
             ["eslint", "npm:8.8.0"],
             ["eslint-config-next", "virtual:d351ea5a0ab3894bacf87be384878820f537e27244a5ef59d6b0c4a0fa87162179379f209bd04190de0f51b0669e78adbd19d9a173dfad046270e476185ba7e6#npm:12.0.10"],
+            ["eslint-config-prettier", "virtual:d351ea5a0ab3894bacf87be384878820f537e27244a5ef59d6b0c4a0fa87162179379f209bd04190de0f51b0669e78adbd19d9a173dfad046270e476185ba7e6#npm:8.3.0"],
             ["next", "virtual:d351ea5a0ab3894bacf87be384878820f537e27244a5ef59d6b0c4a0fa87162179379f209bd04190de0f51b0669e78adbd19d9a173dfad046270e476185ba7e6#npm:12.0.10"],
+            ["prettier", "npm:2.5.1"],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:d351ea5a0ab3894bacf87be384878820f537e27244a5ef59d6b0c4a0fa87162179379f209bd04190de0f51b0669e78adbd19d9a173dfad046270e476185ba7e6#npm:17.0.2"],
             ["typescript", "patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"]
@@ -1256,7 +1258,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react", "npm:17.0.39"],
             ["eslint", "npm:8.8.0"],
             ["eslint-config-next", "virtual:d351ea5a0ab3894bacf87be384878820f537e27244a5ef59d6b0c4a0fa87162179379f209bd04190de0f51b0669e78adbd19d9a173dfad046270e476185ba7e6#npm:12.0.10"],
+            ["eslint-config-prettier", "virtual:d351ea5a0ab3894bacf87be384878820f537e27244a5ef59d6b0c4a0fa87162179379f209bd04190de0f51b0669e78adbd19d9a173dfad046270e476185ba7e6#npm:8.3.0"],
             ["next", "virtual:d351ea5a0ab3894bacf87be384878820f537e27244a5ef59d6b0c4a0fa87162179379f209bd04190de0f51b0669e78adbd19d9a173dfad046270e476185ba7e6#npm:12.0.10"],
+            ["prettier", "npm:2.5.1"],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:d351ea5a0ab3894bacf87be384878820f537e27244a5ef59d6b0c4a0fa87162179379f209bd04190de0f51b0669e78adbd19d9a173dfad046270e476185ba7e6#npm:17.0.2"],
             ["typescript", "patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=493e53"]
@@ -1614,6 +1618,28 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             "eslint",
             "next",
             "typescript"
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["eslint-config-prettier", [
+        ["npm:8.3.0", {
+          "packageLocation": "./.yarn/cache/eslint-config-prettier-npm-8.3.0-f540cd1f53-df4cea3032.zip/node_modules/eslint-config-prettier/",
+          "packageDependencies": [
+            ["eslint-config-prettier", "npm:8.3.0"]
+          ],
+          "linkType": "SOFT",
+        }],
+        ["virtual:d351ea5a0ab3894bacf87be384878820f537e27244a5ef59d6b0c4a0fa87162179379f209bd04190de0f51b0669e78adbd19d9a173dfad046270e476185ba7e6#npm:8.3.0", {
+          "packageLocation": "./.yarn/__virtual__/eslint-config-prettier-virtual-b1ff929aee/0/cache/eslint-config-prettier-npm-8.3.0-f540cd1f53-df4cea3032.zip/node_modules/eslint-config-prettier/",
+          "packageDependencies": [
+            ["eslint-config-prettier", "virtual:d351ea5a0ab3894bacf87be384878820f537e27244a5ef59d6b0c4a0fa87162179379f209bd04190de0f51b0669e78adbd19d9a173dfad046270e476185ba7e6#npm:8.3.0"],
+            ["@types/eslint", null],
+            ["eslint", "npm:8.8.0"]
+          ],
+          "packagePeers": [
+            "@types/eslint",
+            "eslint"
           ],
           "linkType": "HARD",
         }]
@@ -2950,6 +2976,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/prelude-ls-npm-1.2.1-3e4d272a55-cd192ec0d0.zip/node_modules/prelude-ls/",
           "packageDependencies": [
             ["prelude-ls", "npm:1.2.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["prettier", [
+        ["npm:2.5.1", {
+          "packageLocation": "./.yarn/cache/prettier-npm-2.5.1-58b195b509-21b9408476.zip/node_modules/prettier/",
+          "packageDependencies": [
+            ["prettier", "npm:2.5.1"]
           ],
           "linkType": "HARD",
         }]
