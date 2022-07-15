@@ -7,6 +7,8 @@ import MenuItem from '@mui/material/MenuItem'
 
 import { mui } from 'components/libraryComponents'
 
+const localStorageComponentsKey = 'components'
+
 let componentId = -1
 const generateComponentId = () => {
   componentId += 1
@@ -14,7 +16,9 @@ const generateComponentId = () => {
 }
 
 const Home: NextPage = () => {
-  const [components, setComponents] = useState({})
+  const [components, setComponents] = useState(
+    JSON.parse(localStorage.getItem(localStorageComponentsKey)) || {}
+  )
 
   console.log('components', components)
 
@@ -34,10 +38,15 @@ const Home: NextPage = () => {
           value=""
           onChange={(event) => {
             const componentName = event.target.value
-            setComponents({
+            const newComponents = {
               ...components,
               [generateComponentId()]: mui[componentName],
-            })
+            }
+            setComponents(newComponents)
+            localStorage.setItem(
+              localStorageComponentsKey,
+              JSON.stringify(newComponents)
+            )
           }}
         >
           {Object.keys(mui).map((componentName) => (
@@ -49,9 +58,11 @@ const Home: NextPage = () => {
       </div>
 
       <main className={styles.main}>
-        {Object.values(components).map((component) => {
-          const Component = component.component
-          return <Component {...component.props} />
+        {Object.keys(components).map((componentId) => {
+          const Component = components[componentId].component
+          return (
+            <Component key={componentId} {...components[componentId].props} />
+          )
         })}
       </main>
     </div>
