@@ -25,7 +25,6 @@ const localStorageComponentsKey = 'components'
 
 const Home: NextPage = () => {
   const serializedComponents = localStorage.getItem(localStorageComponentsKey)
-  console.log('serializedComponents', serializedComponents)
   const initialState =
     typeof serializedComponents === 'string'
       ? JSON.parse(serializedComponents)
@@ -33,8 +32,6 @@ const Home: NextPage = () => {
 
   const [components, setComponents] =
     useState<SerializedComponents>(initialState)
-
-  console.log('components', components)
 
   return (
     <div className={styles.app}>
