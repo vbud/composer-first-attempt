@@ -1,24 +1,38 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { nanoid } from 'nanoid'
 import styles from 'styles/Home.module.css'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 
-import { mui } from 'components/libraryComponents'
+import {
+  muiComponentName,
+  muiComponents,
+  muiComponentDefaultProps,
+} from 'components/libraryComponents'
+
+type SerializedComponent = {
+  name: muiComponentName
+  props: { [key: string]: string | number }
+}
+
+type SerializedComponents = {
+  [key: string]: SerializedComponent
+}
 
 const localStorageComponentsKey = 'components'
 
-let componentId = -1
-const generateComponentId = () => {
-  componentId += 1
-  return componentId
-}
-
 const Home: NextPage = () => {
-  const [components, setComponents] = useState(
-    JSON.parse(localStorage.getItem(localStorageComponentsKey)) || {}
-  )
+  const serializedComponents = localStorage.getItem(localStorageComponentsKey)
+  console.log('serializedComponents', serializedComponents)
+  const initialState =
+    typeof serializedComponents === 'string'
+      ? JSON.parse(serializedComponents)
+      : {}
+
+  const [components, setComponents] =
+    useState<SerializedComponents>(initialState)
 
   console.log('components', components)
 
@@ -37,10 +51,14 @@ const Home: NextPage = () => {
           size="small"
           value=""
           onChange={(event) => {
-            const componentName = event.target.value
+            // TODO: is there a cleaner way to do this? The selected value will always be a valid muiComponentName.
+            const componentName = event.target.value as muiComponentName
             const newComponents = {
               ...components,
-              [generateComponentId()]: mui[componentName],
+              [nanoid()]: {
+                name: componentName,
+                props: muiComponentDefaultProps[componentName],
+              },
             }
             setComponents(newComponents)
             localStorage.setItem(
@@ -49,7 +67,7 @@ const Home: NextPage = () => {
             )
           }}
         >
-          {Object.keys(mui).map((componentName) => (
+          {Object.values(muiComponentName).map((componentName) => (
             <MenuItem value={componentName} key={componentName}>
               {componentName}
             </MenuItem>
@@ -59,7 +77,7 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         {Object.keys(components).map((componentId) => {
-          const Component = components[componentId].component
+          const Component = muiComponents[components[componentId].name]
           return (
             <Component key={componentId} {...components[componentId].props} />
           )
