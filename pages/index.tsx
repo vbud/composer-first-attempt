@@ -10,8 +10,7 @@ import MenuItem from '@mui/material/MenuItem'
 import {
   deserializeComponent,
   serializeComponent,
-  muiComponentName,
-  muiDefaultComponents,
+  muiDrawableComponents,
   SerializedComponent,
 } from 'components/libraryComponents'
 
@@ -46,22 +45,23 @@ const Home: NextPage = () => {
           size="small"
           value=""
           onChange={(event) => {
-            // TODO: is there a cleaner way to do this? The selected value will always be a valid muiComponentName.
-            const componentName = event.target.value as muiComponentName
-            const newComponents = {
+            const componentName = event.target
+              .value as keyof typeof muiDrawableComponents
+            const serializedComponent = serializeComponent(
+              muiDrawableComponents[componentName]
+            )
+            const updatedComponents = {
               ...components,
-              [nanoid()]: serializeComponent(
-                muiDefaultComponents[componentName]
-              ),
+              [nanoid()]: serializedComponent,
             }
-            setComponents(newComponents)
+            setComponents(updatedComponents)
             localStorage.setItem(
               localStorageComponentsKey,
-              JSON.stringify(newComponents)
+              JSON.stringify(updatedComponents)
             )
           }}
         >
-          {Object.values(muiComponentName).map((componentName) => (
+          {Object.keys(muiDrawableComponents).map((componentName) => (
             <MenuItem value={componentName} key={componentName}>
               {componentName}
             </MenuItem>
@@ -71,7 +71,11 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         {Object.keys(components).map((componentId) => {
-          return deserializeComponent(components[componentId], componentId)
+          const deserializedComponent = deserializeComponent(
+            components[componentId],
+            componentId
+          )
+          return deserializedComponent
         })}
       </main>
     </div>

@@ -4,6 +4,8 @@ import Alert, { AlertProps } from '@mui/material/Alert'
 import Button, { ButtonProps } from '@mui/material/Button'
 import MenuItem from '@mui/material/MenuItem'
 // import Checkbox from '@mui/material/Checkbox'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
 // import RadioGroup from '@mui/material/RadioGroup'
 // import Rating from '@mui/material/Rating'
 import Select, { SelectProps } from '@mui/material/Select'
@@ -13,21 +15,34 @@ import Select, { SelectProps } from '@mui/material/Select'
 // import ToggleButton from '@mui/material/ToggleButton'
 
 // TODO: namespace these component enums so that they are unique (e.g. muiAlert). This will affect serialization (we pull the name off of the rendered component), so we will need to prefix rendered components when serializing, and un-prefix them when deserializing.
-export enum muiComponentName {
+enum muiComponentName {
   Alert = 'Alert',
   Button = 'Button',
+  List = 'List',
+  ListItem = 'ListItem',
+  MenuItem = 'MenuItem',
   Select = 'Select',
 }
 
 export const muiComponents = {
   [muiComponentName.Alert]: Alert,
   [muiComponentName.Button]: Button,
+  [muiComponentName.List]: List,
+  [muiComponentName.ListItem]: ListItem,
+  [muiComponentName.MenuItem]: MenuItem,
   [muiComponentName.Select]: Select,
 }
 
-export const muiDefaultComponents = {
+export const muiDrawableComponents = {
   [muiComponentName.Alert]: <Alert>New Alert!</Alert>,
   [muiComponentName.Button]: <Button>New Button!</Button>,
+  [muiComponentName.List]: (
+    <List>
+      <ListItem>One</ListItem>
+      <ListItem>Two</ListItem>
+      <ListItem>Three</ListItem>
+    </List>
+  ),
   [muiComponentName.Select]: (
     <Select value="" onChange={() => {}}>
       <MenuItem value="1">Option 1</MenuItem>
@@ -83,7 +98,6 @@ export function deserializeComponent(
   component: SerializedComponent,
   key?: string // TODO: this ugly, maybe return the Component and props instead so callers can add whatever props they want
 ): React.ReactElement {
-  const Component = muiComponents[component.name]
   const props = { ...component.props }
 
   Object.keys(props).forEach((propKey) => {
@@ -103,5 +117,5 @@ export function deserializeComponent(
     props.key = key
   }
 
-  return <Component {...props} />
+  return React.createElement(muiComponents[component.name], { ...props, key })
 }
