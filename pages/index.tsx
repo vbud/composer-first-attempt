@@ -6,16 +6,14 @@ import styles from 'styles/Home.module.css'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 
+// TODO: import-ordering prettier or eslint
 import {
+  deserializeComponent,
+  serializeComponent,
   muiComponentName,
-  muiComponents,
-  muiComponentDefaultProps,
+  muiDefaultComponents,
+  SerializedComponent,
 } from 'components/libraryComponents'
-
-type SerializedComponent = {
-  name: muiComponentName
-  props: { [key: string]: string | number }
-}
 
 type SerializedComponents = {
   [key: string]: SerializedComponent
@@ -52,10 +50,9 @@ const Home: NextPage = () => {
             const componentName = event.target.value as muiComponentName
             const newComponents = {
               ...components,
-              [nanoid()]: {
-                name: componentName,
-                props: muiComponentDefaultProps[componentName],
-              },
+              [nanoid()]: serializeComponent(
+                muiDefaultComponents[componentName]
+              ),
             }
             setComponents(newComponents)
             localStorage.setItem(
@@ -74,10 +71,7 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         {Object.keys(components).map((componentId) => {
-          const Component = muiComponents[components[componentId].name]
-          return (
-            <Component key={componentId} {...components[componentId].props} />
-          )
+          return deserializeComponent(components[componentId], componentId)
         })}
       </main>
     </div>
