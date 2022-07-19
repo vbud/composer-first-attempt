@@ -9,7 +9,6 @@ import MenuItem from '@mui/material/MenuItem'
 // TODO: import-ordering prettier or eslint
 import {
   deserializeComponent,
-  serializeComponent,
   muiDrawableComponents,
   SerializedComponent,
 } from 'components/libraryComponents'
@@ -47,12 +46,9 @@ const Home: NextPage = () => {
           onChange={(event) => {
             const componentName = event.target
               .value as keyof typeof muiDrawableComponents
-            const serializedComponent = serializeComponent(
-              muiDrawableComponents[componentName]
-            )
             const updatedComponents = {
               ...components,
-              [nanoid()]: serializedComponent,
+              [nanoid()]: muiDrawableComponents[componentName],
             }
             setComponents(updatedComponents)
             localStorage.setItem(

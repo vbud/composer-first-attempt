@@ -1,85 +1,105 @@
 import React from 'react'
-import Alert, { AlertProps } from '@mui/material/Alert'
+import Alert from '@mui/material/Alert'
 import Autocomplete from '@mui/material/Autocomplete'
-import Button, { ButtonProps } from '@mui/material/Button'
+import Button from '@mui/material/Button'
 import MenuItem from '@mui/material/MenuItem'
 import Checkbox from '@mui/material/Checkbox'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 // import RadioGroup from '@mui/material/RadioGroup'
 // import Rating from '@mui/material/Rating'
-import Select, { SelectProps } from '@mui/material/Select'
+import Select from '@mui/material/Select'
 // import Slider from '@mui/material/Slider'
 // import Switch from '@mui/material/Switch'
 import TextField from '@mui/material/TextField'
+import { AutocompleteRenderInputParams } from '@mui/material/Autocomplete'
 // import ToggleButton from '@mui/material/ToggleButton'
 
-// TODO: namespace these component enums so that they are unique (e.g. muiAlert). This will affect serialization (we pull the name off of the rendered component), so we will need to prefix rendered components when serializing, and un-prefix them when deserializing.
-enum muiComponentName {
-  Alert = 'Alert',
-  Autocomplete = 'Autocomplete',
-  Button = 'Button',
-  Checkbox = 'Checkbox',
-  List = 'List',
-  ListItem = 'ListItem',
-  MenuItem = 'MenuItem',
-  Select = 'Select',
-  TextField = 'TextField',
+// TODO: namespace these component names so that they are unique (e.g. "muiAlert" instead of "Alert"). This will affect serialization (we pull the name off of the rendered component), so we will need to prefix rendered components when serializing, and un-prefix them when deserializing.
+export const muiComponents = {
+  Alert,
+  Autocomplete,
+  Button,
+  Checkbox,
+  List,
+  ListItem,
+  MenuItem,
+  Select,
+  TextField,
 }
 
-export const muiComponents = {
-  [muiComponentName.Alert]: Alert,
-  [muiComponentName.Autocomplete]: Autocomplete,
-  [muiComponentName.Button]: Button,
-  [muiComponentName.Checkbox]: Checkbox,
-  [muiComponentName.List]: List,
-  [muiComponentName.ListItem]: ListItem,
-  [muiComponentName.MenuItem]: MenuItem,
-  [muiComponentName.Select]: Select,
-  [muiComponentName.TextField]: TextField,
+type MuiComponentName = keyof typeof muiComponents
+
+const SERIALIZATION_TYPE_PROPERTY = '__serializationType__'
+enum SerializationType {
+  reactComponent = 'reactComponent',
+  renderProp = 'renderProp',
 }
+
+export type SerializedComponent = {
+  [SERIALIZATION_TYPE_PROPERTY]: SerializationType.reactComponent
+  componentName: MuiComponentName
+  // TODO: can make `any` more specific to any valid JSON type (string, number, boolean, null, array, object)
+  props: { [key: string]: any }
+}
+
+export type SerializedRenderProp = {
+  [SERIALIZATION_TYPE_PROPERTY]: SerializationType.renderProp
+  componentName: MuiComponentName
+  // TODO: can make `any` more specific to any valid JSON type (string, number, boolean, null, array, object) or nested SerializedComponents or SerializedRenderProps
+  props: { [key: string]: any }
+}
+
 export const muiDrawableComponents = {
-  [muiComponentName.Alert]: <Alert>New Alert!</Alert>,
-  // [muiComponentName.Autocomplete]: (
-  //   <Autocomplete
-  //     options={[
-  //       { label: 'The Shawshank Redemption', year: 1994 },
-  //       { label: 'The Godfather', year: 1972 },
-  //       { label: 'The Godfather: Part II', year: 1974 },
-  //       { label: 'The Dark Knight', year: 2008 },
-  //       { label: '12 Angry Men', year: 1957 },
-  //       { label: "Schindler's List", year: 1993 },
-  //       { label: 'Pulp Fiction', year: 1994 },
-  //       {
-  //         label: 'The Lord of the Rings: The Return of the King',
-  //         year: 2003,
-  //       },
-  //       { label: 'The Good, the Bad and the Ugly', year: 1966 },
-  //       { label: 'Fight Club', year: 1999 },
-  //       {
-  //         label: 'The Lord of the Rings: The Fellowship of the Ring',
-  //         year: 2001,
-  //       },
-  //       {
-  //         label: 'Star Wars: Episode V - The Empire Strikes Back',
-  //         year: 1980,
-  //       },
-  //     ]}
-  //     sx={{ width: 300 }}
-  //     renderInput={(params) => <TextField {...params} label="Movie" />}
-  //   />
-  // ),
-  [muiComponentName.Button]: <Button>New Button!</Button>,
-  [muiComponentName.Checkbox]: <Checkbox />,
-  [muiComponentName.List]: (
+  Alert: serializeComponent(<Alert>New Alert!</Alert>),
+  Autocomplete: {
+    [SERIALIZATION_TYPE_PROPERTY]: SerializationType.reactComponent,
+    componentName: 'Autocomplete',
+    props: {
+      options: [
+        { label: 'The Shawshank Redemption', year: 1994 },
+        { label: 'The Godfather', year: 1972 },
+        { label: 'The Godfather: Part II', year: 1974 },
+        { label: 'The Dark Knight', year: 2008 },
+        { label: '12 Angry Men', year: 1957 },
+        { label: "Schindler's List", year: 1993 },
+        { label: 'Pulp Fiction', year: 1994 },
+        {
+          label: 'The Lord of the Rings: The Return of the King',
+          year: 2003,
+        },
+        { label: 'The Good, the Bad and the Ugly', year: 1966 },
+        { label: 'Fight Club', year: 1999 },
+        {
+          label: 'The Lord of the Rings: The Fellowship of the Ring',
+          year: 2001,
+        },
+        {
+          label: 'Star Wars: Episode V - The Empire Strikes Back',
+          year: 1980,
+        },
+      ],
+      renderInput: {
+        [SERIALIZATION_TYPE_PROPERTY]: SerializationType.renderProp,
+        // TODO: update `muiComponentName` to `ComponentName` once we support other libraries
+        componentName: 'TextField',
+        props: {
+          label: 'Movie',
+        },
+      },
+    },
+  },
+  Button: serializeComponent(<Button>New Button!</Button>),
+  Checkbox: serializeComponent(<Checkbox />),
+  List: serializeComponent(
     <List>
       <ListItem>One</ListItem>
       <ListItem>Two</ListItem>
       <ListItem>Three</ListItem>
     </List>
   ),
-  [muiComponentName.Select]: (
-    <Select value="" onChange={() => {}}>
+  Select: serializeComponent(
+    <Select value="">
       <MenuItem value="1">Option 1</MenuItem>
       <MenuItem value="2">Option 2</MenuItem>
       <MenuItem value="3">Option 3</MenuItem>
@@ -87,21 +107,10 @@ export const muiDrawableComponents = {
   ),
 }
 
-const SERIALIZATION_TYPE_PROPERTY = '__serializationType__'
-enum SerializationType {
-  reactElement = 'reactElement',
-}
-
-export type SerializedComponent = {
-  // TODO: maybe something more elegant?
-  [SERIALIZATION_TYPE_PROPERTY]: SerializationType
-  name: muiComponentName
-  // TODO: can make `any` more specific to any valid JSON type (string, number, boolean, null, array, object)
-  props: { [key: string]: any }
-}
-
-// TODO: should rename "component" to "element"
-export function serializeComponent(
+// TODO: deprecate this and just define all components in serialized form?
+// Note: Only supports serializing components with function props. Used internally to make defining drawable components easier.
+function serializeComponent(
+  // TODO: narrow type so `string` is not a valid component
   component: React.ReactElement
 ): SerializedComponent {
   const props = { ...component.props }
@@ -120,9 +129,9 @@ export function serializeComponent(
   })
 
   return {
-    [SERIALIZATION_TYPE_PROPERTY]: SerializationType.reactElement,
+    [SERIALIZATION_TYPE_PROPERTY]: SerializationType.reactComponent,
     // TODO: what if top-level component is not the "component" we are drawing?
-    name: component.type.render.name,
+    componentName: component.type.render.name,
     props,
   }
 }
@@ -131,7 +140,15 @@ function isSerializedComponent(input: any): boolean {
   return (
     input != null &&
     input.hasOwnProperty(SERIALIZATION_TYPE_PROPERTY) &&
-    input[SERIALIZATION_TYPE_PROPERTY] === SerializationType.reactElement
+    input[SERIALIZATION_TYPE_PROPERTY] === SerializationType.reactComponent
+  )
+}
+
+function isSerializedRenderProp(input: any): boolean {
+  return (
+    input != null &&
+    input.hasOwnProperty(SERIALIZATION_TYPE_PROPERTY) &&
+    input[SERIALIZATION_TYPE_PROPERTY] === SerializationType.renderProp
   )
 }
 
@@ -152,11 +169,29 @@ export function deserializeComponent(
     ) {
       props[propKey] = props[propKey].map(deserializeComponent)
     }
+
+    if (isSerializedRenderProp(props[propKey])) {
+      props[propKey] = deserializeRenderProp(props[propKey])
+    }
   })
 
   if (typeof key === 'string') {
     props.key = key
   }
 
-  return React.createElement(muiComponents[component.name], { ...props, key })
+  return React.createElement(muiComponents[component.componentName], {
+    ...props,
+    key,
+  })
+}
+
+function deserializeRenderProp(
+  renderProp: SerializedRenderProp
+): (params: AutocompleteRenderInputParams) => React.ReactNode {
+  // eslint-disable-next-line react/display-name
+  return (params) =>
+    React.createElement(muiComponents[renderProp.componentName], {
+      ...params,
+      ...renderProp.props,
+    })
 }
