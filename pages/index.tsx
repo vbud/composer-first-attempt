@@ -8,26 +8,30 @@ import MenuItem from '@mui/material/MenuItem'
 
 // TODO: import-ordering prettier or eslint
 import {
-  deserializeComponent,
-  muiDrawableComponents,
-  SerializedComponent,
+  drawableComponents,
+  ComponentConfig,
 } from 'components/libraryComponents'
 
-type SerializedComponents = {
-  [key: string]: SerializedComponent
+const localStorageComponentConfigsKey = 'componentConfigs'
+
+type SavedComponentConfigs = {
+  [key: string]: {
+    type: keyof ComponentConfig
+    config: ComponentConfig[keyof ComponentConfig]
+  }
 }
 
-const localStorageComponentsKey = 'components'
-
 const Home: NextPage = () => {
-  const serializedComponents = localStorage.getItem(localStorageComponentsKey)
+  const savedComponentConfigs = localStorage.getItem(
+    localStorageComponentConfigsKey
+  )
   const initialState =
-    typeof serializedComponents === 'string'
-      ? JSON.parse(serializedComponents)
+    typeof savedComponentConfigs === 'string'
+      ? JSON.parse(savedComponentConfigs)
       : {}
 
-  const [components, setComponents] =
-    useState<SerializedComponents>(initialState)
+  const [componentConfigs, setComponentConfigs] =
+    useState<SavedComponentConfigs>(initialState)
 
   return (
     <div className={styles.app}>
@@ -44,20 +48,22 @@ const Home: NextPage = () => {
           size="small"
           value=""
           onChange={(event) => {
-            const componentName = event.target
-              .value as keyof typeof muiDrawableComponents
-            const updatedComponents = {
-              ...components,
-              [nanoid()]: muiDrawableComponents[componentName],
+            const componentType = event.target.value as keyof ComponentConfig
+            const updatedComponentConfigs = {
+              ...componentConfigs,
+              [nanoid()]: {
+                type: componentType,
+                config: drawableComponents[componentType].defaultConfig,
+              },
             }
-            setComponents(updatedComponents)
+            setComponentConfigs(updatedComponentConfigs)
             localStorage.setItem(
-              localStorageComponentsKey,
-              JSON.stringify(updatedComponents)
+              localStorageComponentConfigsKey,
+              JSON.stringify(updatedComponentConfigs)
             )
           }}
         >
-          {Object.keys(muiDrawableComponents).map((componentName) => (
+          {Object.keys(drawableComponents).map((componentName) => (
             <MenuItem value={componentName} key={componentName}>
               {componentName}
             </MenuItem>
@@ -66,12 +72,14 @@ const Home: NextPage = () => {
       </div>
 
       <main className={styles.main}>
-        {Object.keys(components).map((componentId) => {
-          const deserializedComponent = deserializeComponent(
-            components[componentId],
-            componentId
+        {Object.keys(componentConfigs).map((componentId) => {
+          const { type, config } = componentConfigs[componentId]
+          return (
+            <React.Fragment key={componentId}>
+              {/* TODO: need typescript magic */}
+              {drawableComponents[type].render(config)}
+            </React.Fragment>
           )
-          return deserializedComponent
         })}
       </main>
     </div>
