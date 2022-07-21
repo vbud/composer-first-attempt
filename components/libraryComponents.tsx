@@ -7,6 +7,11 @@ import Checkbox, { CheckboxProps } from '@mui/material/Checkbox'
 import List, { ListProps } from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import Select, { SelectProps } from '@mui/material/Select'
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
 import TextField, { TextFieldProps } from '@mui/material/TextField'
 
 export type ComponentConfig = {
@@ -31,6 +36,10 @@ export type ComponentConfig = {
   muiSelect: {
     value: SelectProps['value']
     options: Array<string>
+  }
+  muiTable: {
+    columnNames: Array<string>
+    rows: Array<Array<string | number>>
   }
 }
 
@@ -105,6 +114,49 @@ export const drawableComponents: {
           </MenuItem>
         ))}
       </Select>
+    ),
+  },
+  muiTable: {
+    defaultConfig: {
+      columnNames: [
+        'Dessert (100g serving)',
+        'Calories',
+        'Fat (g)',
+        'Carbs (g)',
+        'Protein (g)',
+      ],
+      rows: [
+        ['Frozen yoghurt', 159, 6.0, 24, 4.0],
+        ['Ice cream sandwich', 237, 9.0, 37, 4.3],
+        ['Eclair', 262, 16.0, 24, 6.0],
+        ['Cupcake', 305, 3.7, 67, 4.3],
+        ['Gingerbread', 356, 16.0, 49, 3.9],
+      ],
+    },
+    render: (config) => (
+      <Table>
+        <TableHead>
+          <TableRow>
+            {config.columnNames.map((columnName) => (
+              <TableCell key={columnName}>{columnName}</TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {config.rows.map((row, i) => (
+            <TableRow key={i}>
+              {row.map((cell, i) => (
+                <TableCell
+                  key={i}
+                  align={typeof cell === 'number' ? 'right' : 'left'}
+                >
+                  {cell}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     ),
   },
 }
