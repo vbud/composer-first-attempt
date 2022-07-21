@@ -146,12 +146,7 @@ export const drawableComponents: {
           {config.rows.map((row, i) => (
             <TableRow key={i}>
               {row.map((cell, i) => (
-                <TableCell
-                  key={i}
-                  align={typeof cell === 'number' ? 'right' : 'left'}
-                >
-                  {cell}
-                </TableCell>
+                <TableCell key={i}>{cell}</TableCell>
               ))}
             </TableRow>
           ))}
