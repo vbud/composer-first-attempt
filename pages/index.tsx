@@ -1,37 +1,24 @@
+// TODO: import-ordering prettier or eslint
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import React, { useState } from 'react'
 import { nanoid } from 'nanoid'
-import styles from 'styles/Home.module.css'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 
-// TODO: import-ordering prettier or eslint
-import {
-  drawableComponents,
-  ComponentConfig,
-} from 'components/libraryComponents'
+import { ComponentId, ComponentConfig, SavedComponentConfigs } from 'types'
+import { drawableComponents } from 'components/libraryComponents'
+import { ComponentEditor } from 'components/componentEditor'
+import { readComponentConfigs, saveComponentConfigs } from 'utils/localStorage'
 
-const localStorageComponentConfigsKey = 'componentConfigs'
-
-type SavedComponentConfigs = {
-  [key: string]: {
-    type: keyof ComponentConfig
-    config: ComponentConfig[keyof ComponentConfig]
-  }
-}
+import styles from 'styles/Home.module.css'
 
 const Home: NextPage = () => {
-  const savedComponentConfigs = localStorage.getItem(
-    localStorageComponentConfigsKey
-  )
-  const initialState =
-    typeof savedComponentConfigs === 'string'
-      ? JSON.parse(savedComponentConfigs)
-      : {}
-
   const [componentConfigs, setComponentConfigs] =
-    useState<SavedComponentConfigs>(initialState)
+    useState<SavedComponentConfigs>(readComponentConfigs())
+
+  const [selectedComponentId, setSelectedComponentId] =
+    useState<ComponentId | null>(null)
 
   return (
     <div className={styles.app}>
@@ -57,10 +44,7 @@ const Home: NextPage = () => {
               },
             }
             setComponentConfigs(updatedComponentConfigs)
-            localStorage.setItem(
-              localStorageComponentConfigsKey,
-              JSON.stringify(updatedComponentConfigs)
-            )
+            saveComponentConfigs(updatedComponentConfigs)
           }}
         >
           {Object.keys(drawableComponents).map((componentName) => (
@@ -71,17 +55,44 @@ const Home: NextPage = () => {
         </Select>
       </div>
 
-      <main className={styles.main}>
+      <div
+        className={styles.main}
+        onClick={() => {
+          // If the click gets here, a component was not clicked because `stopPropagation` is called whenever a component is clicked.
+          setSelectedComponentId(null)
+        }}
+      >
         {Object.keys(componentConfigs).map((componentId) => {
           const { type, config } = componentConfigs[componentId]
           return (
-            <React.Fragment key={componentId}>
-              {/* TODO: need typescript magic */}
-              {drawableComponents[type].render(config)}
-            </React.Fragment>
+            <div
+              key={componentId}
+              className={
+                componentId === selectedComponentId
+                  ? styles.selected
+                  : undefined
+              }
+              onClick={(event) => {
+                setSelectedComponentId(componentId)
+                event.stopPropagation()
+              }}
+            >
+              {/* Ensure children do not swallow clicks */}
+              <div style={{ pointerEvents: 'none' }}>
+                {/* TODO: need typescript magic */}
+                {drawableComponents[type].render(config)}
+              </div>
+            </div>
           )
         })}
-      </main>
+      </div>
+
+      <div className={styles.componentEditor}>
+        <ComponentEditor
+          componentId={selectedComponentId}
+          componentConfigs={componentConfigs}
+        />
+      </div>
     </div>
   )
 }

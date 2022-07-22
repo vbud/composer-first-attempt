@@ -1,47 +1,20 @@
 import React from 'react'
-import Alert, { AlertProps } from '@mui/material/Alert'
+import Alert from '@mui/material/Alert'
 import Autocomplete from '@mui/material/Autocomplete'
-import Button, { ButtonProps } from '@mui/material/Button'
+import Button from '@mui/material/Button'
 import MenuItem from '@mui/material/MenuItem'
-import Checkbox, { CheckboxProps } from '@mui/material/Checkbox'
-import List, { ListProps } from '@mui/material/List'
+import Checkbox from '@mui/material/Checkbox'
+import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
-import Select, { SelectProps } from '@mui/material/Select'
+import Select from '@mui/material/Select'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
-import TextField, { TextFieldProps } from '@mui/material/TextField'
+import TextField from '@mui/material/TextField'
 
-export type ComponentConfig = {
-  muiAlert: {
-    severity: AlertProps['severity']
-    content: AlertProps['children']
-  }
-  muiAutocomplete: {
-    textFieldLabel: TextFieldProps['label']
-    options: ReadonlyArray<{ label: string }>
-  }
-  muiButton: {
-    content: ButtonProps['children']
-  }
-  muiCheckbox: {
-    defaultChecked: CheckboxProps['defaultChecked']
-  }
-  muiList: {
-    dense: ListProps['dense']
-    items: Array<string>
-  }
-  muiSelect: {
-    value: SelectProps['value']
-    options: Array<string>
-  }
-  muiTable: {
-    columnNames: Array<string>
-    rows: Array<Array<string | number>>
-  }
-}
+import { ComponentConfig } from 'types'
 
 export const drawableComponents: {
   [Property in keyof ComponentConfig]: {
@@ -103,7 +76,7 @@ export const drawableComponents: {
   },
   muiSelect: {
     defaultConfig: {
-      value: '',
+      value: 'apple',
       options: ['apple', 'orange', 'banana'],
     },
     render: (config) => (
