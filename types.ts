@@ -36,9 +36,11 @@ export type ComponentConfig = {
   }
 }
 
+type SavedComponentConfig<Key extends keyof ComponentConfig> = {
+  type: Key
+  config: ComponentConfig[Key]
+}
+
 export type SavedComponentConfigs = {
-  [key: ComponentId]: {
-    type: keyof ComponentConfig
-    config: ComponentConfig[keyof ComponentConfig]
-  }
+  [key: ComponentId]: SavedComponentConfig<keyof ComponentConfig>
 }
