@@ -2,21 +2,19 @@ import { ComponentId, SavedComponentConfigs } from 'types'
 
 import styles from 'styles/ComponentEditor.module.css'
 
-type ComponentEditorProps = {
-  componentId: ComponentId | null
-  componentConfigs: SavedComponentConfigs
-}
-
 export const ComponentEditor = ({
   componentId,
-  componentConfigs: savedComponentConfigs,
-}: ComponentEditorProps) => {
+  componentConfigs,
+}: {
+  componentId: ComponentId | null
+  componentConfigs: SavedComponentConfigs
+}) => {
   let content: React.ReactNode = null
 
   if (componentId === null) {
     content = 'No component selected.'
   } else {
-    const config = savedComponentConfigs[componentId].config
+    const config = componentConfigs[componentId].config
     content = Object.keys(config).map((configKey) => (
       <div key={configKey}>
         {configKey}:{' '}
@@ -27,5 +25,5 @@ export const ComponentEditor = ({
     ))
   }
 
-  return <div className={styles.ComponentEditor}>{content}</div>
+  return <div className={styles.root}>{content}</div>
 }

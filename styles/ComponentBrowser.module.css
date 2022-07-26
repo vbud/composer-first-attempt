@@ -1,0 +1,17 @@
+.root {
+  padding: 1rem;
+  padding-left: 0;
+}
+
+.componentWrapper {
+  padding-left: 1rem;
+}
+
+.component {
+  cursor: pointer;
+}
+
+.selected {
+  background: blue;
+  color: white;
+}

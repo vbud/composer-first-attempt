@@ -6,6 +6,7 @@ specifiers:
   '@mui/material': 5.9.1
   '@types/node': 18.0.5
   '@types/react': 18.0.15
+  classnames: ^2.3.1
   eslint: 8.19.0
   eslint-config-next: 12.2.2
   eslint-config-prettier: 8.5.0
@@ -20,6 +21,7 @@ dependencies:
   '@emotion/react': 11.9.3_4gfzdku2uxzmcxoufcoh2xryee
   '@emotion/styled': 11.9.3_dlulqo5ieffshbt3nq3utknply
   '@mui/material': 5.9.1_wud3ah3it2nq2ypv4xvv3uyvwq
+  classnames: 2.3.1
   nanoid: 4.0.0
   next: 12.2.2_sfoxds7t5ydpegc3knd667wn6m
   react: 17.0.2
@@ -828,6 +830,10 @@ packages:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
     dev: true
+
+  /classnames/2.3.1:
+    resolution: {integrity: sha512-OlQdbZ7gLfGarSqxesMesDa5uz7KFbID8Kpq/SxIoNGDqY8lSYs0D+hhtBXhcdB3rcbXArFr7vlHheLk1voeNA==}
+    dev: false
 
   /clsx/1.2.1:
     resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}

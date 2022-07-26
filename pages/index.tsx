@@ -13,6 +13,7 @@ import {
   RootComponentConfig,
 } from 'types'
 import { drawableComponents } from 'components/libraryComponents'
+import { ComponentBrowser } from 'components/componentBrowser'
 import { ComponentEditor } from 'components/componentEditor'
 import {
   readComponentConfigs,
@@ -33,8 +34,8 @@ const Home: NextPage = () => {
   const [selectedComponentId, setSelectedComponentId] =
     useState<ComponentId | null>(null)
 
-  const renderChildComponents = (childComponentIds: Array<ComponentId>) => {
-    return childComponentIds.map((componentId) => {
+  const renderComponents = (componentIds: Array<ComponentId>) => {
+    return componentIds.map((componentId) => {
       const { type, config, childComponentIds } = componentConfigs[componentId]
 
       let children
@@ -43,7 +44,7 @@ const Home: NextPage = () => {
         Array.isArray(childComponentIds) &&
         childComponentIds.length > 0
       ) {
-        children = renderChildComponents(childComponentIds)
+        children = renderComponents(childComponentIds)
       }
 
       return (
@@ -67,7 +68,7 @@ const Home: NextPage = () => {
   }
 
   return (
-    <div className={styles.app}>
+    <div className={styles.root}>
       <Head>
         <title>composition</title>
         <meta name="description" content="Design with your design system" />
@@ -130,6 +131,15 @@ const Home: NextPage = () => {
         </Select>
       </div>
 
+      <div className={styles.componentBrowser}>
+        <ComponentBrowser
+          rootComponentConfig={rootComponentConfig}
+          componentConfigs={componentConfigs}
+          selectedComponentId={selectedComponentId}
+          setSelectedComponentId={setSelectedComponentId}
+        />
+      </div>
+
       <div
         className={styles.main}
         onClick={() => {
@@ -137,7 +147,7 @@ const Home: NextPage = () => {
           setSelectedComponentId(null)
         }}
       >
-        {renderChildComponents(rootComponentConfig.childComponentIds)}
+        {renderComponents(rootComponentConfig.childComponentIds)}
       </div>
 
       <div className={styles.componentEditor}>
