@@ -7,6 +7,7 @@ import Checkbox from '@mui/material/Checkbox'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import Select from '@mui/material/Select'
+import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -19,7 +20,11 @@ import { ComponentConfig } from 'types'
 export const drawableComponents: {
   [Property in keyof ComponentConfig]: {
     defaultConfig: ComponentConfig[Property]
-    render: (config: ComponentConfig[Property]) => React.ReactElement
+    canSupportChildren?: boolean
+    render: (
+      config: ComponentConfig[Property],
+      children?: React.ReactNode
+    ) => React.ReactElement
   }
 } = {
   muiAlert: {
@@ -87,6 +92,18 @@ export const drawableComponents: {
           </MenuItem>
         ))}
       </Select>
+    ),
+  },
+  muiStack: {
+    defaultConfig: {
+      direction: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      spacing: 0,
+    },
+    canSupportChildren: true,
+    render: (config, children) => (
+      <Stack {...config}>{children == null ? '<Stack>' : children}</Stack>
     ),
   },
   muiTable: {

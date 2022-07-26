@@ -30,17 +30,35 @@ export type ComponentConfig = {
     value: SelectProps['value']
     options: Array<string>
   }
+  muiStack: {
+    direction: 'row' | 'row-reverse' | 'column' | 'column-reverse'
+    alignItems: 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline'
+    justifyContent:
+      | 'flex-start'
+      | 'center'
+      | 'flex-end'
+      | 'space-between'
+      | 'space-around'
+      | 'space-evenly'
+    spacing: number
+  }
   muiTable: {
     columnNames: Array<string>
     rows: Array<Array<string | number>>
   }
 }
 
-type SavedComponentConfig<Key extends keyof ComponentConfig> = {
+export type SavedComponentConfig<Key extends keyof ComponentConfig> = {
   type: Key
   config: ComponentConfig[Key]
+  childComponentIds: Array<ComponentId>
 }
 
 export type SavedComponentConfigs = {
   [key: ComponentId]: SavedComponentConfig<keyof ComponentConfig>
+}
+
+export type RootComponentConfig = {
+  config: {}
+  childComponentIds: Array<ComponentId>
 }

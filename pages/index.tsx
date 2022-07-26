@@ -6,10 +6,20 @@ import { nanoid } from 'nanoid'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 
-import { ComponentId, ComponentConfig, SavedComponentConfigs } from 'types'
+import {
+  ComponentId,
+  ComponentConfig,
+  SavedComponentConfigs,
+  RootComponentConfig,
+} from 'types'
 import { drawableComponents } from 'components/libraryComponents'
 import { ComponentEditor } from 'components/componentEditor'
-import { readComponentConfigs, saveComponentConfigs } from 'utils/localStorage'
+import {
+  readComponentConfigs,
+  saveComponentConfigs,
+  readRootComponentConfig,
+  saveRootComponentConfig,
+} from 'utils/localStorage'
 
 import styles from 'styles/Home.module.css'
 
@@ -17,8 +27,44 @@ const Home: NextPage = () => {
   const [componentConfigs, setComponentConfigs] =
     useState<SavedComponentConfigs>(readComponentConfigs())
 
+  const [rootComponentConfig, setRootComponentConfig] =
+    useState<RootComponentConfig>(readRootComponentConfig())
+
   const [selectedComponentId, setSelectedComponentId] =
     useState<ComponentId | null>(null)
+
+  const renderChildComponents = (childComponentIds: Array<ComponentId>) => {
+    return childComponentIds.map((componentId) => {
+      const { type, config, childComponentIds } = componentConfigs[componentId]
+
+      let children
+      if (
+        drawableComponents[type].canSupportChildren &&
+        Array.isArray(childComponentIds) &&
+        childComponentIds.length > 0
+      ) {
+        children = renderChildComponents(childComponentIds)
+      }
+
+      return (
+        <div
+          key={componentId}
+          className={
+            componentId === selectedComponentId ? styles.selected : undefined
+          }
+          onClick={(event) => {
+            setSelectedComponentId(componentId)
+            event.stopPropagation()
+          }}
+        >
+          {/* Ensure children do not swallow clicks */}
+          <div style={{ pointerEvents: 'none' }}>
+            {drawableComponents[type].render(config, children)}
+          </div>
+        </div>
+      )
+    })
+  }
 
   return (
     <div className={styles.app}>
@@ -36,13 +82,42 @@ const Home: NextPage = () => {
           value=""
           onChange={(event) => {
             const componentType = event.target.value as keyof ComponentConfig
+
+            const newComponentId = nanoid()
+
+            const newComponentConfig = {
+              type: componentType,
+              config: drawableComponents[componentType].defaultConfig,
+              childComponentIds: [],
+            }
+
             const updatedComponentConfigs = {
               ...componentConfigs,
-              [nanoid()]: {
-                type: componentType,
-                config: drawableComponents[componentType].defaultConfig,
-              },
+              [newComponentId]: newComponentConfig,
             }
+
+            if (
+              selectedComponentId !== null &&
+              drawableComponents[componentConfigs[selectedComponentId].type]
+                .canSupportChildren
+            ) {
+              updatedComponentConfigs[selectedComponentId].childComponentIds = [
+                ...updatedComponentConfigs[selectedComponentId]
+                  .childComponentIds,
+                newComponentId,
+              ]
+            } else {
+              const updatedRootComponentConfig: RootComponentConfig = {
+                ...rootComponentConfig,
+                childComponentIds: [
+                  ...rootComponentConfig.childComponentIds,
+                  newComponentId,
+                ],
+              }
+              setRootComponentConfig(updatedRootComponentConfig)
+              saveRootComponentConfig(updatedRootComponentConfig)
+            }
+
             setComponentConfigs(updatedComponentConfigs)
             saveComponentConfigs(updatedComponentConfigs)
           }}
@@ -62,29 +137,7 @@ const Home: NextPage = () => {
           setSelectedComponentId(null)
         }}
       >
-        {Object.keys(componentConfigs).map((componentId) => {
-          const { type, config } = componentConfigs[componentId]
-          return (
-            <div
-              key={componentId}
-              className={
-                componentId === selectedComponentId
-                  ? styles.selected
-                  : undefined
-              }
-              onClick={(event) => {
-                setSelectedComponentId(componentId)
-                event.stopPropagation()
-              }}
-            >
-              {/* Ensure children do not swallow clicks */}
-              <div style={{ pointerEvents: 'none' }}>
-                {/* TODO: need typescript magic */}
-                {drawableComponents[type].render(config)}
-              </div>
-            </div>
-          )
-        })}
+        {renderChildComponents(rootComponentConfig.childComponentIds)}
       </div>
 
       <div className={styles.componentEditor}>
