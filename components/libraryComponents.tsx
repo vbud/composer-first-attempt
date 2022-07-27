@@ -39,15 +39,12 @@ export const drawableComponents: {
   muiAutocomplete: {
     defaultConfig: {
       textFieldLabel: 'Soup',
-      options: [
-        { label: 'Minestrone' },
-        { label: 'Chicken noodle' },
-        { label: 'Lentil' },
-      ],
+      options: ['Minestrone', 'Chicken noodle', 'Lentil'],
     },
     render: (config) => (
       <Autocomplete
         options={config.options}
+        getOptionLabel={(option) => option}
         renderInput={(params) => (
           <TextField {...params} label={config.textFieldLabel} />
         )}
