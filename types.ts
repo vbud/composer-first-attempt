@@ -1,33 +1,26 @@
-import { AlertProps } from '@mui/material/Alert'
-import { ButtonProps } from '@mui/material/Button'
-import { CheckboxProps } from '@mui/material/Checkbox'
-import { ListProps } from '@mui/material/List'
-import { SelectProps } from '@mui/material/Select'
-import { TextFieldProps } from '@mui/material/TextField'
-
 export type ComponentId = string
 
 export type ComponentConfig = {
   muiAlert: {
-    severity: AlertProps['severity']
-    content: AlertProps['children']
+    severity: 'success' | 'info' | 'warning' | 'error'
+    content: string
   }
   muiAutocomplete: {
-    textFieldLabel: TextFieldProps['label']
+    textFieldLabel: string
     options: ReadonlyArray<{ label: string }>
   }
   muiButton: {
-    content: ButtonProps['children']
+    content: string
   }
   muiCheckbox: {
-    defaultChecked: CheckboxProps['defaultChecked']
+    defaultChecked: boolean
   }
   muiList: {
-    dense: ListProps['dense']
+    dense: boolean
     items: Array<string>
   }
   muiSelect: {
-    value: SelectProps['value']
+    value: string
     options: Array<string>
   }
   muiStack: {
