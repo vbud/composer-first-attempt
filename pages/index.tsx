@@ -34,6 +34,13 @@ const Home: NextPage = () => {
   const [selectedComponentId, setSelectedComponentId] =
     useState<ComponentId | null>(null)
 
+  const setAndSaveComponentConfigs = (
+    updatedComponentConfigs: SavedComponentConfigs
+  ) => {
+    setComponentConfigs(updatedComponentConfigs)
+    saveComponentConfigs(updatedComponentConfigs)
+  }
+
   const renderComponents = (componentIds: Array<ComponentId>) => {
     return componentIds.map((componentId) => {
       const { type, config, childComponentIds } = componentConfigs[componentId]
@@ -119,8 +126,7 @@ const Home: NextPage = () => {
               saveRootComponentConfig(updatedRootComponentConfig)
             }
 
-            setComponentConfigs(updatedComponentConfigs)
-            saveComponentConfigs(updatedComponentConfigs)
+            setAndSaveComponentConfigs(updatedComponentConfigs)
           }}
         >
           {Object.keys(drawableComponents).map((componentName) => (
@@ -154,6 +160,7 @@ const Home: NextPage = () => {
         <ComponentEditor
           componentId={selectedComponentId}
           componentConfigs={componentConfigs}
+          onChangeComponentConfigs={setAndSaveComponentConfigs}
         />
       </div>
     </div>

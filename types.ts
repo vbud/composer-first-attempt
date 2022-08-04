@@ -21,7 +21,7 @@ type ComponentConfigDefinition =
       type: 'customListOfLists'
     }
 
-const ComponentConfigDefinitions: {
+export const componentConfigDefinitions: {
   [P1 in keyof ComponentConfig]: {
     [P2 in keyof ComponentConfig[P1]]: ComponentConfigDefinition
   }
@@ -105,7 +105,7 @@ const ComponentConfigDefinitions: {
 
 export type ComponentConfig = {
   muiAlert: {
-    severity: typeof ComponentConfigDefinitions.muiAlert.severity.options[number]
+    severity: typeof componentConfigDefinitions.muiAlert.severity.options[number]
     content: string
   }
   muiAutocomplete: {
@@ -127,9 +127,9 @@ export type ComponentConfig = {
     options: Array<string>
   }
   muiStack: {
-    direction: typeof ComponentConfigDefinitions.muiStack.direction.options[number]
-    alignItems: typeof ComponentConfigDefinitions.muiStack.alignItems.options[number]
-    justifyContent: typeof ComponentConfigDefinitions.muiStack.justifyContent.options[number]
+    direction: typeof componentConfigDefinitions.muiStack.direction.options[number]
+    alignItems: typeof componentConfigDefinitions.muiStack.alignItems.options[number]
+    justifyContent: typeof componentConfigDefinitions.muiStack.justifyContent.options[number]
     spacing: number
   }
   muiTable: {
@@ -138,14 +138,15 @@ export type ComponentConfig = {
   }
 }
 
-export type SavedComponentConfig<Key extends keyof ComponentConfig> = {
-  type: Key
-  config: ComponentConfig[Key]
+export type SavedComponentConfig = {
+  // TODO: rename to `componentType`
+  type: keyof ComponentConfig
+  config: ComponentConfig[keyof ComponentConfig]
   childComponentIds: Array<ComponentId>
 }
 
 export type SavedComponentConfigs = {
-  [key: ComponentId]: SavedComponentConfig<keyof ComponentConfig>
+  [key: ComponentId]: SavedComponentConfig
 }
 
 export type RootComponentConfig = {

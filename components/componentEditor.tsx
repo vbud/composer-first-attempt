@@ -1,27 +1,86 @@
-import { ComponentId, SavedComponentConfigs } from 'types'
+import {
+  ComponentId,
+  SavedComponentConfigs,
+  ComponentConfig,
+  componentConfigDefinitions,
+} from 'types'
 
 import styles from 'styles/ComponentEditor.module.css'
 
+type ConfigItemKey = keyof ComponentConfig[keyof ComponentConfig]
+type ConfigItemValue = ComponentConfig[ConfigItemKey]
+
+type ConfigItemEditorProps = {
+  componentType: keyof ComponentConfig
+  configItemKey: ConfigItemKey
+  configItemValue: ConfigItemValue
+  onChange: (value: ConfigItemValue) => {}
+}
+
+const ConfigItemEditor = ({
+  componentType,
+  configItemKey,
+  configItemValue,
+  onChange,
+}: ConfigItemEditorProps) => {
+  const componentConfigDefinition =
+    componentConfigDefinitions[componentType][configItemKey]
+  if (componentConfigDefinition.type === 'predefinedList') {
+    return (
+      <div>
+        {configItemKey}:
+        <select
+          value={configItemValue}
+          onChange={(event) => onChange(event.target.value as ConfigItemValue)}
+        >
+          {componentConfigDefinition.options.map((option) => (
+            <option key={option}>{option}</option>
+          ))}
+        </select>
+      </div>
+    )
+  }
+
+  return null
+}
+
+type ComponentEditorProps = {
+  componentId: ComponentId | null
+  componentConfigs: SavedComponentConfigs
+  onChangeComponentConfigs: (configs: SavedComponentConfigs) => void
+}
+
+// TODO: rename to ComponentConfigEditor
 export const ComponentEditor = ({
   componentId,
   componentConfigs,
-}: {
-  componentId: ComponentId | null
-  componentConfigs: SavedComponentConfigs
-}) => {
+  onChangeComponentConfigs,
+}: ComponentEditorProps) => {
   let content: React.ReactNode = null
 
   if (componentId === null) {
     content = 'No component selected.'
   } else {
-    const config = componentConfigs[componentId].config
-    content = Object.keys(config).map((configKey) => (
-      <div key={configKey}>
-        {configKey}:{' '}
-        {Array.isArray(config[configKey])
-          ? config[configKey].join(', ')
-          : config[configKey]}
-      </div>
+    const { config, type } = componentConfigs[componentId]
+    content = Object.keys(config).map((configItemKey) => (
+      <ConfigItemEditor
+        key={configItemKey}
+        componentType={type}
+        configItemKey={configItemKey}
+        configItemValue={config[configItemKey]}
+        onChange={(value) => {
+          onChangeComponentConfigs({
+            ...componentConfigs,
+            [componentId]: {
+              ...componentConfigs[componentId],
+              config: {
+                ...componentConfigs[componentId].config,
+                [configItemKey]: value,
+              },
+            },
+          })
+        }}
+      />
     ))
   }
 
