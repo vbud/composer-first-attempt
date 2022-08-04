@@ -18,11 +18,11 @@ export const ComponentBrowser = ({
 }) => {
   const renderComponents = (componentIds: Array<ComponentId>) => {
     return componentIds.map((componentId) => {
-      const { type, childComponentIds } = componentConfigs[componentId]
+      const { componentType, childComponentIds } = componentConfigs[componentId]
 
       let children
       if (
-        drawableComponents[type].canSupportChildren &&
+        drawableComponents[componentType].canSupportChildren &&
         Array.isArray(childComponentIds) &&
         childComponentIds.length > 0
       ) {
@@ -39,7 +39,7 @@ export const ComponentBrowser = ({
               setSelectedComponentId(componentId)
             }}
           >
-            {type}
+            {componentType}
           </div>
           {children}
         </div>

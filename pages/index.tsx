@@ -43,11 +43,12 @@ const Home: NextPage = () => {
 
   const renderComponents = (componentIds: Array<ComponentId>) => {
     return componentIds.map((componentId) => {
-      const { type, config, childComponentIds } = componentConfigs[componentId]
+      const { componentType, config, childComponentIds } =
+        componentConfigs[componentId]
 
       let children
       if (
-        drawableComponents[type].canSupportChildren &&
+        drawableComponents[componentType].canSupportChildren &&
         Array.isArray(childComponentIds) &&
         childComponentIds.length > 0
       ) {
@@ -67,7 +68,7 @@ const Home: NextPage = () => {
         >
           {/* Ensure children do not swallow clicks */}
           <div style={{ pointerEvents: 'none' }}>
-            {drawableComponents[type].render(config, children)}
+            {drawableComponents[componentType].render(config, children)}
           </div>
         </div>
       )
@@ -94,7 +95,7 @@ const Home: NextPage = () => {
             const newComponentId = nanoid()
 
             const newComponentConfig = {
-              type: componentType,
+              componentType,
               config: drawableComponents[componentType].defaultConfig,
               childComponentIds: [],
             }
@@ -106,8 +107,9 @@ const Home: NextPage = () => {
 
             if (
               selectedComponentId !== null &&
-              drawableComponents[componentConfigs[selectedComponentId].type]
-                .canSupportChildren
+              drawableComponents[
+                componentConfigs[selectedComponentId].componentType
+              ].canSupportChildren
             ) {
               updatedComponentConfigs[selectedComponentId].childComponentIds = [
                 ...updatedComponentConfigs[selectedComponentId]

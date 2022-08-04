@@ -139,8 +139,7 @@ export type ComponentConfig = {
 }
 
 export type SavedComponentConfig = {
-  // TODO: rename to `componentType`
-  type: keyof ComponentConfig
+  componentType: keyof ComponentConfig
   config: ComponentConfig[keyof ComponentConfig]
   childComponentIds: Array<ComponentId>
 }

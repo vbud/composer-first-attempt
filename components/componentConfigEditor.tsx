@@ -50,7 +50,6 @@ type ComponentEditorProps = {
   onChangeComponentConfigs: (configs: SavedComponentConfigs) => void
 }
 
-// TODO: rename to ComponentConfigEditor
 export const ComponentConfigEditor = ({
   componentId,
   componentConfigs,
@@ -61,11 +60,11 @@ export const ComponentConfigEditor = ({
   if (componentId === null) {
     content = 'No component selected.'
   } else {
-    const { config, type } = componentConfigs[componentId]
+    const { config, componentType } = componentConfigs[componentId]
     content = Object.keys(config).map((configItemKey) => (
       <ConfigItemEditor
         key={configItemKey}
-        componentType={type}
+        componentType={componentType}
         configItemKey={configItemKey}
         configItemValue={config[configItemKey]}
         onChange={(value) => {
