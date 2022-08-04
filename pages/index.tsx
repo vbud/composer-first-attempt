@@ -11,6 +11,7 @@ import {
   ComponentConfig,
   SavedComponentConfigs,
   RootComponentConfig,
+  SavedComponentConfig,
 } from 'types'
 import { drawableComponents } from 'components/libraryComponents'
 import { ComponentBrowser } from 'components/componentBrowser'
@@ -33,6 +34,13 @@ const Home: NextPage = () => {
 
   const [selectedComponentId, setSelectedComponentId] =
     useState<ComponentId | null>(null)
+
+  const setAndSaveRootComponentConfig = (
+    updatedRootComponentConfig: RootComponentConfig
+  ) => {
+    setRootComponentConfig(updatedRootComponentConfig)
+    saveRootComponentConfig(updatedRootComponentConfig)
+  }
 
   const setAndSaveComponentConfigs = (
     updatedComponentConfigs: SavedComponentConfigs
@@ -61,9 +69,60 @@ const Home: NextPage = () => {
           className={
             componentId === selectedComponentId ? styles.selected : undefined
           }
+          // Allows element to be focused, which in turn allows the element to capture key presses
+          tabIndex={-1}
           onClick={(event) => {
             setSelectedComponentId(componentId)
             event.stopPropagation()
+          }}
+          onKeyDown={(event) => {
+            // Delete the component
+            if (event.code === 'Backspace') {
+              setSelectedComponentId(null)
+
+              const updatedComponentConfigs = {
+                ...componentConfigs,
+              }
+              const { parentComponentId } = updatedComponentConfigs[componentId]
+
+              // Remove the component from the parent's `childComponentIds`
+              // The parent can be the root component or a regular component
+              if (parentComponentId === null) {
+                const updatedRootComponentConfig = {
+                  ...rootComponentConfig,
+                  childComponentIds:
+                    rootComponentConfig.childComponentIds.filter(
+                      (id) => id !== componentId
+                    ),
+                }
+                setAndSaveRootComponentConfig(updatedRootComponentConfig)
+              } else {
+                updatedComponentConfigs[parentComponentId].childComponentIds =
+                  componentConfigs[parentComponentId].childComponentIds.filter(
+                    (id) => id !== componentId
+                  )
+              }
+
+              const descendantComponentIds: Array<ComponentId> = []
+              const findDescendantComponentIds = (componentId: ComponentId) => {
+                updatedComponentConfigs[componentId].childComponentIds.forEach(
+                  (id) => {
+                    // Queue component for deletion
+                    descendantComponentIds.unshift(id)
+                    // Find remaining descendant components
+                    findDescendantComponentIds(id)
+                  }
+                )
+              }
+              findDescendantComponentIds(componentId)
+              descendantComponentIds.forEach(
+                (id) => delete updatedComponentConfigs[id]
+              )
+
+              delete updatedComponentConfigs[componentId]
+
+              setAndSaveComponentConfigs(updatedComponentConfigs)
+            }
           }}
         >
           {/* Ensure children do not swallow clicks */}
@@ -94,10 +153,11 @@ const Home: NextPage = () => {
 
             const newComponentId = nanoid()
 
-            const newComponentConfig = {
+            const newComponentConfig: SavedComponentConfig = {
               componentType,
               config: drawableComponents[componentType].defaultConfig,
               childComponentIds: [],
+              parentComponentId: null,
             }
 
             const updatedComponentConfigs = {
@@ -116,6 +176,8 @@ const Home: NextPage = () => {
                   .childComponentIds,
                 newComponentId,
               ]
+              updatedComponentConfigs[newComponentId].parentComponentId =
+                selectedComponentId
             } else {
               const updatedRootComponentConfig: RootComponentConfig = {
                 ...rootComponentConfig,
@@ -124,8 +186,7 @@ const Home: NextPage = () => {
                   newComponentId,
                 ],
               }
-              setRootComponentConfig(updatedRootComponentConfig)
-              saveRootComponentConfig(updatedRootComponentConfig)
+              setAndSaveRootComponentConfig(updatedRootComponentConfig)
             }
 
             setAndSaveComponentConfigs(updatedComponentConfigs)

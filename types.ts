@@ -142,6 +142,7 @@ export type SavedComponentConfig = {
   componentType: keyof ComponentConfig
   config: ComponentConfig[keyof ComponentConfig]
   childComponentIds: Array<ComponentId>
+  parentComponentId: ComponentId | null
 }
 
 export type SavedComponentConfigs = {
