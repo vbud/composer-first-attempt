@@ -51,7 +51,7 @@ type ComponentEditorProps = {
 }
 
 // TODO: rename to ComponentConfigEditor
-export const ComponentEditor = ({
+export const ComponentConfigEditor = ({
   componentId,
   componentConfigs,
   onChangeComponentConfigs,

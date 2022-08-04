@@ -14,7 +14,7 @@ import {
 } from 'types'
 import { drawableComponents } from 'components/libraryComponents'
 import { ComponentBrowser } from 'components/componentBrowser'
-import { ComponentEditor } from 'components/componentEditor'
+import { ComponentConfigEditor } from 'components/componentConfigEditor'
 import {
   readComponentConfigs,
   saveComponentConfigs,
@@ -157,7 +157,7 @@ const Home: NextPage = () => {
       </div>
 
       <div className={styles.componentEditor}>
-        <ComponentEditor
+        <ComponentConfigEditor
           componentId={selectedComponentId}
           componentConfigs={componentConfigs}
           onChangeComponentConfigs={setAndSaveComponentConfigs}
