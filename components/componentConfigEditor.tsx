@@ -45,12 +45,37 @@ const ConfigItemEditor = ({
         {configItemKey}:
         <select
           value={String(configItemValue)}
-          onChange={(event) => onChange(event.target.value === 'true')}
+          onChange={(event) =>
+            onChange((event.target.value === 'true') as ConfigItemValue)
+          }
         >
           {['true', 'false'].map((option) => (
             <option key={option}>{option}</option>
           ))}
         </select>
+      </div>
+    )
+  } else if (componentConfigDefinition.type === 'string') {
+    return (
+      <div>
+        {configItemKey}:
+        <input
+          onChange={(event) => onChange(event.target.value as ConfigItemValue)}
+          value={configItemValue}
+        />
+      </div>
+    )
+  } else if (componentConfigDefinition.type === 'number') {
+    return (
+      <div>
+        {configItemKey}:
+        <input
+          onChange={(event) =>
+            onChange(Number(event.target.value) as ConfigItemValue)
+          }
+          value={configItemValue}
+          type="number"
+        />
       </div>
     )
   }
