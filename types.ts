@@ -49,7 +49,7 @@ export const componentConfigDefinitions: {
     },
   },
   muiCheckbox: {
-    defaultChecked: {
+    checked: {
       type: 'boolean',
     },
   },
@@ -116,7 +116,7 @@ export type ComponentConfig = {
     content: string
   }
   muiCheckbox: {
-    defaultChecked: boolean
+    checked: boolean
   }
   muiList: {
     dense: boolean

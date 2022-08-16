@@ -59,9 +59,9 @@ export const drawableComponents: {
   },
   muiCheckbox: {
     defaultConfig: {
-      defaultChecked: false,
+      checked: false,
     },
-    render: (config) => <Checkbox defaultChecked={config.defaultChecked} />,
+    render: (config) => <Checkbox checked={config.checked} />,
   },
   muiList: {
     defaultConfig: {

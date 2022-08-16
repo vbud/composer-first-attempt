@@ -39,6 +39,20 @@ const ConfigItemEditor = ({
         </select>
       </div>
     )
+  } else if (componentConfigDefinition.type === 'boolean') {
+    return (
+      <div>
+        {configItemKey}:
+        <select
+          value={String(configItemValue)}
+          onChange={(event) => onChange(event.target.value === 'true')}
+        >
+          {['true', 'false'].map((option) => (
+            <option key={option}>{option}</option>
+          ))}
+        </select>
+      </div>
+    )
   }
 
   return null
