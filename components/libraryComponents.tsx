@@ -13,6 +13,8 @@ import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
 import TextField from '@mui/material/TextField'
 
 import { ComponentConfig } from 'types'
@@ -139,6 +141,19 @@ export const drawableComponents: {
           ))}
         </TableBody>
       </Table>
+    ),
+  },
+  muiTabs: {
+    defaultConfig: {
+      currentTab: 0,
+      labels: ['Tab 1', 'Tab 2', 'Tab 3'],
+    },
+    render: (config) => (
+      <Tabs value={config.currentTab}>
+        {config.labels.map((label) => (
+          <Tab key={label} label={label} />
+        ))}
+      </Tabs>
     ),
   },
 }

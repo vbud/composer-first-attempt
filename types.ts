@@ -101,6 +101,14 @@ export const componentConfigDefinitions: {
       type: 'customListOfLists',
     },
   },
+  muiTabs: {
+    currentTab: {
+      type: 'number',
+    },
+    labels: {
+      type: 'customList',
+    },
+  },
 }
 
 export type ComponentConfig = {
@@ -135,6 +143,10 @@ export type ComponentConfig = {
   muiTable: {
     columnNames: Array<string>
     rows: Array<Array<string | number>>
+  }
+  muiTabs: {
+    currentTab: number
+    labels: Array<string>
   }
 }
 
