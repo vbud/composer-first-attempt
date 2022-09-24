@@ -50,6 +50,15 @@ export const componentConfigDefinitions: {
       type: 'string',
     },
   },
+  muiButtonGroup: {
+    variant: {
+      type: 'predefinedList',
+      options: ['outlined', 'contained', 'text'] as const,
+    },
+    buttons: {
+      type: 'customList',
+    },
+  },
   muiCheckbox: {
     checked: {
       type: 'boolean',
@@ -149,6 +158,10 @@ export type ComponentConfig = {
   }
   muiButton: {
     content: string
+  }
+  muiButtonGroup: {
+    variant: typeof componentConfigDefinitions.muiButtonGroup.variant.options[number]
+    buttons: Array<string>
   }
   muiCheckbox: {
     checked: boolean

@@ -2,6 +2,7 @@ import React from 'react'
 import Alert from '@mui/material/Alert'
 import Autocomplete from '@mui/material/Autocomplete'
 import Button from '@mui/material/Button'
+import ButtonGroup from '@mui/material/ButtonGroup'
 import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FormLabel from '@mui/material/FormLabel'
@@ -64,6 +65,19 @@ export const drawableComponents: {
       content: 'New button',
     },
     render: (config) => <Button>{config.content}</Button>,
+  },
+  muiButtonGroup: {
+    defaultConfig: {
+      variant: 'outlined',
+      buttons: ['Button 1', 'Button 2', 'Button 3'],
+    },
+    render: (config) => (
+      <ButtonGroup variant={config.variant}>
+        {config.buttons.map((button) => (
+          <Button key={button}>{button}</Button>
+        ))}
+      </ButtonGroup>
+    ),
   },
   muiCheckbox: {
     defaultConfig: {
