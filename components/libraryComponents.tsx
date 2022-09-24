@@ -2,10 +2,15 @@ import React from 'react'
 import Alert from '@mui/material/Alert'
 import Autocomplete from '@mui/material/Autocomplete'
 import Button from '@mui/material/Button'
+import FormControl from '@mui/material/FormControl'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import FormLabel from '@mui/material/FormLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Checkbox from '@mui/material/Checkbox'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
+import Radio from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
 import Select from '@mui/material/Select'
 import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
@@ -76,6 +81,28 @@ export const drawableComponents: {
           <ListItem key={item}>{item}</ListItem>
         ))}
       </List>
+    ),
+  },
+  muiRadioGroup: {
+    defaultConfig: {
+      label: 'Color',
+      value: 'red',
+      options: ['red', 'blue', 'green'],
+    },
+    render: (config) => (
+      <FormControl>
+        <RadioGroup value={config.value}>
+          <FormLabel>{config.label}</FormLabel>
+          {config.options.map((option) => (
+            <FormControlLabel
+              key={option}
+              value={option}
+              label={option}
+              control={<Radio />}
+            />
+          ))}
+        </RadioGroup>
+      </FormControl>
     ),
   },
   muiSelect: {

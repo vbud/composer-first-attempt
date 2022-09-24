@@ -61,6 +61,17 @@ export const componentConfigDefinitions: {
       type: 'customList',
     },
   },
+  muiRadioGroup: {
+    label: {
+      type: 'string',
+    },
+    value: {
+      type: 'string',
+    },
+    options: {
+      type: 'customList',
+    },
+  },
   muiSelect: {
     value: {
       type: 'string',
@@ -129,6 +140,11 @@ export type ComponentConfig = {
   muiList: {
     dense: boolean
     items: Array<string>
+  }
+  muiRadioGroup: {
+    label: string
+    value: string
+    options: Array<string>
   }
   muiSelect: {
     value: string
