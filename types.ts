@@ -1,3 +1,5 @@
+import { muiIcons } from 'components/icons'
+
 export type ComponentId = string
 
 type ComponentConfigDefinition =
@@ -51,6 +53,12 @@ export const componentConfigDefinitions: {
   muiCheckbox: {
     checked: {
       type: 'boolean',
+    },
+  },
+  muiIcon: {
+    name: {
+      type: 'predefinedList',
+      options: Object.keys(muiIcons),
     },
   },
   muiList: {
@@ -144,6 +152,9 @@ export type ComponentConfig = {
   }
   muiCheckbox: {
     checked: boolean
+  }
+  muiIcon: {
+    name: typeof componentConfigDefinitions.muiIcon.name.options[number]
   }
   muiList: {
     dense: boolean

@@ -23,11 +23,12 @@ import Tabs from '@mui/material/Tabs'
 import TextField from '@mui/material/TextField'
 
 import { ComponentConfig } from 'types'
+import { muiIcons } from './icons'
 
 export const drawableComponents: {
   [Property in keyof ComponentConfig]: {
-    defaultConfig: ComponentConfig[Property]
     canSupportChildren?: boolean
+    defaultConfig: ComponentConfig[Property]
     render: (
       config: ComponentConfig[Property],
       children?: React.ReactNode
@@ -69,6 +70,15 @@ export const drawableComponents: {
       checked: false,
     },
     render: (config) => <Checkbox checked={config.checked} />,
+  },
+  muiIcon: {
+    defaultConfig: {
+      name: 'home',
+    },
+    render: (config) => {
+      const IconComponent = muiIcons[config.name]
+      return <IconComponent />
+    },
   },
   muiList: {
     defaultConfig: {
@@ -121,13 +131,13 @@ export const drawableComponents: {
     ),
   },
   muiStack: {
+    canSupportChildren: true,
     defaultConfig: {
       direction: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       spacing: 0,
     },
-    canSupportChildren: true,
     render: (config, children) => (
       <Stack {...config}>{children == null ? '<Stack>' : children}</Stack>
     ),
