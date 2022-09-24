@@ -120,6 +120,14 @@ export const componentConfigDefinitions: {
       type: 'customList',
     },
   },
+  muiTextField: {
+    label: {
+      type: 'string',
+    },
+    value: {
+      type: 'string',
+    },
+  },
 }
 
 export type ComponentConfig = {
@@ -163,6 +171,10 @@ export type ComponentConfig = {
   muiTabs: {
     currentTab: number
     labels: Array<string>
+  }
+  muiTextField: {
+    label: string
+    value: string
   }
 }
 

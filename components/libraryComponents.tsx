@@ -183,4 +183,11 @@ export const drawableComponents: {
       </Tabs>
     ),
   },
+  muiTextField: {
+    defaultConfig: {
+      label: 'Phone number',
+      value: '(555) 123-4567',
+    },
+    render: (config) => <TextField label={config.label} value={config.value} />,
+  },
 }
