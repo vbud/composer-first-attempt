@@ -10,11 +10,13 @@ export const ComponentBrowser = ({
   componentConfigs,
   selectedComponentId,
   setSelectedComponentId,
+  deleteComponent,
 }: {
   rootComponentConfig: RootComponentConfig
   componentConfigs: SavedComponentConfigs
   selectedComponentId: ComponentId | null
   setSelectedComponentId: (componentId: ComponentId | null) => void
+  deleteComponent: (componentId: ComponentId) => void
 }) => {
   const renderComponents = (componentIds: Array<ComponentId>) => {
     return componentIds.map((componentId) => {
@@ -37,6 +39,13 @@ export const ComponentBrowser = ({
             })}
             onClick={() => {
               setSelectedComponentId(componentId)
+            }}
+            // Allows element to be focused, which in turn allows the element to capture key presses
+            tabIndex={-1}
+            onKeyDown={(event) => {
+              if (event.code === 'Backspace') {
+                deleteComponent(componentId)
+              }
             }}
           >
             {componentType}

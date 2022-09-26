@@ -1,4 +1,3 @@
-// TODO: import-ordering prettier or eslint
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import React, { useState } from 'react'
@@ -49,6 +48,48 @@ const Home: NextPage = () => {
     saveComponentConfigs(updatedComponentConfigs)
   }
 
+  const deleteComponent = (componentId: ComponentId) => {
+    setSelectedComponentId(null)
+
+    const updatedComponentConfigs = {
+      ...componentConfigs,
+    }
+    const { parentComponentId } = updatedComponentConfigs[componentId]
+
+    // Remove the component from the parent's `childComponentIds`
+    // The parent can be the root component or a regular component
+    if (parentComponentId === null) {
+      const updatedRootComponentConfig = {
+        ...rootComponentConfig,
+        childComponentIds: rootComponentConfig.childComponentIds.filter(
+          (id) => id !== componentId
+        ),
+      }
+      setAndSaveRootComponentConfig(updatedRootComponentConfig)
+    } else {
+      updatedComponentConfigs[parentComponentId].childComponentIds =
+        componentConfigs[parentComponentId].childComponentIds.filter(
+          (id) => id !== componentId
+        )
+    }
+
+    const descendantComponentIds: Array<ComponentId> = []
+    const findDescendantComponentIds = (componentId: ComponentId) => {
+      updatedComponentConfigs[componentId].childComponentIds.forEach((id) => {
+        // Queue component for deletion
+        descendantComponentIds.unshift(id)
+        // Find remaining descendant components
+        findDescendantComponentIds(id)
+      })
+    }
+    findDescendantComponentIds(componentId)
+    descendantComponentIds.forEach((id) => delete updatedComponentConfigs[id])
+
+    delete updatedComponentConfigs[componentId]
+
+    setAndSaveComponentConfigs(updatedComponentConfigs)
+  }
+
   const renderComponents = (componentIds: Array<ComponentId>) => {
     return componentIds.map((componentId) => {
       const { componentType, config, childComponentIds } =
@@ -69,59 +110,15 @@ const Home: NextPage = () => {
           className={
             componentId === selectedComponentId ? styles.selected : undefined
           }
-          // Allows element to be focused, which in turn allows the element to capture key presses
-          tabIndex={-1}
           onClick={(event) => {
             setSelectedComponentId(componentId)
             event.stopPropagation()
           }}
+          // Allows element to be focused, which in turn allows the element to capture key presses
+          tabIndex={-1}
           onKeyDown={(event) => {
-            // Delete the component
             if (event.code === 'Backspace') {
-              setSelectedComponentId(null)
-
-              const updatedComponentConfigs = {
-                ...componentConfigs,
-              }
-              const { parentComponentId } = updatedComponentConfigs[componentId]
-
-              // Remove the component from the parent's `childComponentIds`
-              // The parent can be the root component or a regular component
-              if (parentComponentId === null) {
-                const updatedRootComponentConfig = {
-                  ...rootComponentConfig,
-                  childComponentIds:
-                    rootComponentConfig.childComponentIds.filter(
-                      (id) => id !== componentId
-                    ),
-                }
-                setAndSaveRootComponentConfig(updatedRootComponentConfig)
-              } else {
-                updatedComponentConfigs[parentComponentId].childComponentIds =
-                  componentConfigs[parentComponentId].childComponentIds.filter(
-                    (id) => id !== componentId
-                  )
-              }
-
-              const descendantComponentIds: Array<ComponentId> = []
-              const findDescendantComponentIds = (componentId: ComponentId) => {
-                updatedComponentConfigs[componentId].childComponentIds.forEach(
-                  (id) => {
-                    // Queue component for deletion
-                    descendantComponentIds.unshift(id)
-                    // Find remaining descendant components
-                    findDescendantComponentIds(id)
-                  }
-                )
-              }
-              findDescendantComponentIds(componentId)
-              descendantComponentIds.forEach(
-                (id) => delete updatedComponentConfigs[id]
-              )
-
-              delete updatedComponentConfigs[componentId]
-
-              setAndSaveComponentConfigs(updatedComponentConfigs)
+              deleteComponent(componentId)
             }
           }}
         >
@@ -206,6 +203,7 @@ const Home: NextPage = () => {
           componentConfigs={componentConfigs}
           selectedComponentId={selectedComponentId}
           setSelectedComponentId={setSelectedComponentId}
+          deleteComponent={deleteComponent}
         />
       </div>
 
