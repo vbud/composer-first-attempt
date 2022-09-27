@@ -5,7 +5,7 @@ import {
   componentConfigDefinitions,
 } from 'types'
 
-import styles from 'styles/ComponentEditor.module.css'
+import styles from 'styles/ComponentConfigEditor.module.css'
 
 type ConfigItemKey = keyof ComponentConfig[keyof ComponentConfig]
 type ConfigItemValue = ComponentConfig[ConfigItemKey]
@@ -25,59 +25,94 @@ const ConfigItemEditor = ({
 }: ConfigItemEditorProps) => {
   const componentConfigDefinition =
     componentConfigDefinitions[componentType][configItemKey]
-  if (componentConfigDefinition.type === 'predefinedList') {
-    return (
-      <div>
-        {configItemKey}:
-        <select
-          value={configItemValue}
-          onChange={(event) => onChange(event.target.value as ConfigItemValue)}
-        >
-          {componentConfigDefinition.options.map((option) => (
-            <option key={option}>{option}</option>
+  switch (componentConfigDefinition.type) {
+    case 'boolean':
+      return (
+        <div>
+          <div>{configItemKey}:</div>
+          <select
+            value={String(configItemValue)}
+            onChange={(event) =>
+              onChange((event.target.value === 'true') as ConfigItemValue)
+            }
+          >
+            {['true', 'false'].map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+        </div>
+      )
+    case 'string':
+      return (
+        <div>
+          <div>{configItemKey}:</div>
+          <input
+            onChange={(event) =>
+              onChange(event.target.value as ConfigItemValue)
+            }
+            value={configItemValue}
+          />
+        </div>
+      )
+    case 'number':
+      return (
+        <div>
+          <div>{configItemKey}:</div>
+          <input
+            onChange={(event) =>
+              onChange(Number(event.target.value) as ConfigItemValue)
+            }
+            value={configItemValue}
+            type="number"
+          />
+        </div>
+      )
+    case 'predefinedList':
+      return (
+        <div>
+          <div>{configItemKey}:</div>
+          <select
+            value={configItemValue}
+            onChange={(event) =>
+              onChange(event.target.value as ConfigItemValue)
+            }
+          >
+            {componentConfigDefinition.options.map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+        </div>
+      )
+    case 'customList':
+      return (
+        <div>
+          <div>{configItemKey}:</div>
+          {(configItemValue as Array<string>).map((listItem, i) => (
+            <div key={i} className={styles.customListItem}>
+              <input
+                value={listItem}
+                onChange={(event) => {
+                  const newValue = [...configItemValue]
+                  newValue[i] = event.target.value
+                  onChange(newValue)
+                }}
+              />
+              <button
+                onClick={() => {
+                  const newValue = [...configItemValue]
+                  newValue.splice(i, 1)
+                  onChange(newValue)
+                }}
+              >
+                -
+              </button>
+            </div>
           ))}
-        </select>
-      </div>
-    )
-  } else if (componentConfigDefinition.type === 'boolean') {
-    return (
-      <div>
-        {configItemKey}:
-        <select
-          value={String(configItemValue)}
-          onChange={(event) =>
-            onChange((event.target.value === 'true') as ConfigItemValue)
-          }
-        >
-          {['true', 'false'].map((option) => (
-            <option key={option}>{option}</option>
-          ))}
-        </select>
-      </div>
-    )
-  } else if (componentConfigDefinition.type === 'string') {
-    return (
-      <div>
-        {configItemKey}:
-        <input
-          onChange={(event) => onChange(event.target.value as ConfigItemValue)}
-          value={configItemValue}
-        />
-      </div>
-    )
-  } else if (componentConfigDefinition.type === 'number') {
-    return (
-      <div>
-        {configItemKey}:
-        <input
-          onChange={(event) =>
-            onChange(Number(event.target.value) as ConfigItemValue)
-          }
-          value={configItemValue}
-          type="number"
-        />
-      </div>
-    )
+          <button onClick={() => onChange([...configItemValue, 'New item'])}>
+            +
+          </button>
+        </div>
+      )
   }
 
   return null

@@ -201,8 +201,8 @@ export const drawableComponents: {
     },
     render: (config) => (
       <Tabs value={config.currentTab}>
-        {config.labels.map((label) => (
-          <Tab key={label} label={label} />
+        {config.labels.map((label, i) => (
+          <Tab key={i} label={label} />
         ))}
       </Tabs>
     ),
