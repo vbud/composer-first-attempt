@@ -13,7 +13,6 @@ import ListItem from '@mui/material/ListItem'
 import Radio from '@mui/material/Radio'
 import RadioGroup from '@mui/material/RadioGroup'
 import Select from '@mui/material/Select'
-import Stack from '@mui/material/Stack'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -28,7 +27,7 @@ import { muiIcons } from './icons'
 
 export const drawableComponents: {
   [Property in keyof ComponentConfig]: {
-    canSupportChildren?: boolean
+    isLayoutComponent?: boolean
     defaultConfig: ComponentConfig[Property]
     render: (
       config: ComponentConfig[Property],
@@ -36,6 +35,16 @@ export const drawableComponents: {
     ) => React.ReactElement
   }
 } = {
+  layoutFlex: {
+    isLayoutComponent: true,
+    defaultConfig: {
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 0,
+    },
+    render: (config, children) => <div style={{ ...config }}>{children}</div>,
+  },
   muiAlert: {
     defaultConfig: {
       severity: 'success',
@@ -142,18 +151,6 @@ export const drawableComponents: {
           </MenuItem>
         ))}
       </Select>
-    ),
-  },
-  muiStack: {
-    canSupportChildren: true,
-    defaultConfig: {
-      direction: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      spacing: 0,
-    },
-    render: (config, children) => (
-      <Stack {...config}>{children == null ? '<Stack>' : children}</Stack>
     ),
   },
   muiTable: {

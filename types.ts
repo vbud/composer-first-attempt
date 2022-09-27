@@ -28,6 +28,30 @@ export const componentConfigDefinitions: {
     [P2 in keyof ComponentConfig[P1]]: ComponentConfigDefinition
   }
 } = {
+  layoutFlex: {
+    flexDirection: {
+      type: 'predefinedList',
+      options: ['row', 'row-reverse', 'column', 'column-reverse'],
+    },
+    alignItems: {
+      type: 'predefinedList',
+      options: ['flex-start', 'center', 'flex-end', 'stretch', 'baseline'],
+    },
+    justifyContent: {
+      type: 'predefinedList',
+      options: [
+        'flex-start',
+        'center',
+        'flex-end',
+        'space-between',
+        'space-around',
+        'space-evenly',
+      ],
+    },
+    gap: {
+      type: 'number',
+    },
+  },
   muiAlert: {
     severity: {
       type: 'predefinedList',
@@ -97,30 +121,6 @@ export const componentConfigDefinitions: {
       type: 'customList',
     },
   },
-  muiStack: {
-    direction: {
-      type: 'predefinedList',
-      options: ['row', 'row-reverse', 'column', 'column-reverse'],
-    },
-    alignItems: {
-      type: 'predefinedList',
-      options: ['flex-start', 'center', 'flex-end', 'stretch', 'baseline'],
-    },
-    justifyContent: {
-      type: 'predefinedList',
-      options: [
-        'flex-start',
-        'center',
-        'flex-end',
-        'space-between',
-        'space-around',
-        'space-evenly',
-      ],
-    },
-    spacing: {
-      type: 'number',
-    },
-  },
   muiTable: {
     columnNames: {
       type: 'customList',
@@ -182,11 +182,11 @@ export type ComponentConfig = {
     value: string
     options: Array<string>
   }
-  muiStack: {
-    direction: typeof componentConfigDefinitions.muiStack.direction.options[number]
-    alignItems: typeof componentConfigDefinitions.muiStack.alignItems.options[number]
-    justifyContent: typeof componentConfigDefinitions.muiStack.justifyContent.options[number]
-    spacing: number
+  layoutFlex: {
+    flexDirection: typeof componentConfigDefinitions.layoutFlex.flexDirection.options[number]
+    alignItems: typeof componentConfigDefinitions.layoutFlex.alignItems.options[number]
+    justifyContent: typeof componentConfigDefinitions.layoutFlex.justifyContent.options[number]
+    gap: number
   }
   muiTable: {
     columnNames: Array<string>

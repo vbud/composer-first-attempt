@@ -63,7 +63,7 @@ export const ComponentBrowser = ({
 
       let children
       if (
-        drawableComponents[componentType].canSupportChildren &&
+        drawableComponents[componentType].isLayoutComponent &&
         Array.isArray(childComponentIds) &&
         childComponentIds.length > 0
       ) {

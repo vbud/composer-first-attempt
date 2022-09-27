@@ -97,7 +97,7 @@ const Home: NextPage = () => {
 
       let children
       if (
-        drawableComponents[componentType].canSupportChildren &&
+        drawableComponents[componentType].isLayoutComponent &&
         Array.isArray(childComponentIds) &&
         childComponentIds.length > 0
       ) {
@@ -166,7 +166,7 @@ const Home: NextPage = () => {
               selectedComponentId !== null &&
               drawableComponents[
                 componentConfigs[selectedComponentId].componentType
-              ].canSupportChildren
+              ].isLayoutComponent
             ) {
               updatedComponentConfigs[selectedComponentId].childComponentIds = [
                 ...updatedComponentConfigs[selectedComponentId]
@@ -189,11 +189,16 @@ const Home: NextPage = () => {
             setAndSaveComponentConfigs(updatedComponentConfigs)
           }}
         >
-          {Object.keys(drawableComponents).map((componentName) => (
-            <MenuItem value={componentName} key={componentName}>
-              {componentName}
-            </MenuItem>
-          ))}
+          {Object.keys(drawableComponents)
+            .filter(
+              (componentName) =>
+                !drawableComponents[componentName].isLayoutComponent
+            )
+            .map((componentName) => (
+              <MenuItem value={componentName} key={componentName}>
+                {componentName}
+              </MenuItem>
+            ))}
         </Select>
       </div>
 
