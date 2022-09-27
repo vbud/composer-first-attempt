@@ -4,7 +4,7 @@
   height: 100vh;
   grid-template-areas:
     'header header header'
-    'componentBrowser main componentEditor';
+    'componentBrowser canvas componentConfigEditor';
   grid-template-columns: 180px auto 240px;
   grid-template-rows: 50px auto;
 }
@@ -19,26 +19,4 @@
 
 .addComponent {
   margin-left: auto;
-}
-
-.main {
-  grid-area: main;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: scroll;
-}
-
-.componentBrowser {
-  grid-area: componentBrowser;
-  border-right: 1px solid lightgray;
-}
-
-.componentEditor {
-  grid-area: componentEditor;
-  border-left: 1px solid lightgray;
-}
-
-.selected {
-  outline: 4px solid cyan;
 }

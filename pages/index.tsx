@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import { nanoid } from 'nanoid'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
-import classnames from 'classnames'
 
 import {
   ComponentId,
@@ -15,6 +14,7 @@ import {
 } from 'types'
 import { drawableComponents } from 'components/libraryComponents'
 import { ComponentBrowser } from 'components/componentBrowser'
+import { Canvas } from 'components/canvas'
 import { ComponentConfigEditor } from 'components/componentConfigEditor'
 import {
   readComponentConfigs,
@@ -98,51 +98,6 @@ const Home: NextPage = () => {
     setAndSaveComponentConfigs(updatedComponentConfigs)
   }
 
-  const renderComponents = (componentIds: Array<ComponentId>) => {
-    return componentIds.map((componentId) => {
-      const { componentType, config, childComponentIds } =
-        componentConfigs[componentId]
-
-      let children
-      if (
-        drawableComponents[componentType].isLayoutComponent &&
-        Array.isArray(childComponentIds) &&
-        childComponentIds.length > 0
-      ) {
-        children = renderComponents(childComponentIds)
-      }
-
-      return (
-        <div
-          key={componentId}
-          className={classnames({
-            [styles.selected]: selectedComponentIds.includes(componentId),
-          })}
-          onClick={(event) => {
-            if (event.metaKey) {
-              setSelectedComponentIds([...selectedComponentIds, componentId])
-            } else {
-              setSelectedComponentIds([componentId])
-            }
-            event.stopPropagation()
-          }}
-          // Allows element to be focused, which in turn allows the element to capture key presses
-          tabIndex={-1}
-          onKeyDown={(event) => {
-            if (event.code === 'Backspace') {
-              deleteSelectedComponents()
-            }
-          }}
-        >
-          {/* Ensure children do not swallow clicks */}
-          <div style={{ pointerEvents: 'none' }}>
-            {drawableComponents[componentType].render(config, children)}
-          </div>
-        </div>
-      )
-    })
-  }
-
   return (
     <div className={styles.root}>
       <Head>
@@ -216,33 +171,27 @@ const Home: NextPage = () => {
         </Select>
       </div>
 
-      <div className={styles.componentBrowser}>
-        <ComponentBrowser
-          rootComponentConfig={rootComponentConfig}
-          componentConfigs={componentConfigs}
-          selectedComponentIds={selectedComponentIds}
-          setSelectedComponentIds={setSelectedComponentIds}
-          deleteSelectedComponents={deleteSelectedComponents}
-        />
-      </div>
+      <ComponentBrowser
+        rootComponentConfig={rootComponentConfig}
+        componentConfigs={componentConfigs}
+        selectedComponentIds={selectedComponentIds}
+        setSelectedComponentIds={setSelectedComponentIds}
+        deleteSelectedComponents={deleteSelectedComponents}
+      />
 
-      <div
-        className={styles.main}
-        onClick={() => {
-          // If the click gets here, a component was not clicked because `stopPropagation` is called whenever a component is clicked.
-          setSelectedComponentIds([])
-        }}
-      >
-        {renderComponents(rootComponentConfig.childComponentIds)}
-      </div>
+      <Canvas
+        rootComponentConfig={rootComponentConfig}
+        componentConfigs={componentConfigs}
+        selectedComponentIds={selectedComponentIds}
+        setSelectedComponentIds={setSelectedComponentIds}
+        deleteSelectedComponents={deleteSelectedComponents}
+      />
 
-      <div className={styles.componentEditor}>
-        <ComponentConfigEditor
-          componentIds={selectedComponentIds}
-          componentConfigs={componentConfigs}
-          onChangeComponentConfigs={setAndSaveComponentConfigs}
-        />
-      </div>
+      <ComponentConfigEditor
+        componentIds={selectedComponentIds}
+        componentConfigs={componentConfigs}
+        onChangeComponentConfigs={setAndSaveComponentConfigs}
+      />
     </div>
   )
 }

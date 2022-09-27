@@ -1,0 +1,11 @@
+.root {
+  grid-area: canvas;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: scroll;
+}
+
+.selected {
+  outline: 4px solid cyan;
+}
