@@ -119,21 +119,24 @@ const ConfigItemEditor = ({
 }
 
 type ComponentEditorProps = {
-  componentId: ComponentId | null
+  componentIds: Array<ComponentId>
   componentConfigs: SavedComponentConfigs
   onChangeComponentConfigs: (configs: SavedComponentConfigs) => void
 }
 
 export const ComponentConfigEditor = ({
-  componentId,
+  componentIds,
   componentConfigs,
   onChangeComponentConfigs,
 }: ComponentEditorProps) => {
   let content: React.ReactNode = null
 
-  if (componentId === null) {
+  if (componentIds.length === 0) {
     content = 'No component selected.'
+  } else if (componentIds.length > 1) {
+    content = 'Multiple components selected.'
   } else {
+    const componentId = componentIds[0]
     const { config, componentType } = componentConfigs[componentId]
     content = Object.keys(config).map((configItemKey) => (
       <ConfigItemEditor

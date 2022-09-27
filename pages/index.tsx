@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { nanoid } from 'nanoid'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
+import classnames from 'classnames'
 
 import {
   ComponentId,
@@ -31,8 +32,9 @@ const Home: NextPage = () => {
   const [rootComponentConfig, setRootComponentConfig] =
     useState<RootComponentConfig>(readRootComponentConfig())
 
-  const [selectedComponentId, setSelectedComponentId] =
-    useState<ComponentId | null>(null)
+  const [selectedComponentIds, setSelectedComponentIds] = useState<
+    Array<ComponentId>
+  >([])
 
   const setAndSaveRootComponentConfig = (
     updatedRootComponentConfig: RootComponentConfig
@@ -48,45 +50,51 @@ const Home: NextPage = () => {
     saveComponentConfigs(updatedComponentConfigs)
   }
 
-  const deleteComponent = (componentId: ComponentId) => {
-    setSelectedComponentId(null)
+  const deleteSelectedComponents = () => {
+    const selectedComponentIdsToDelete = [...selectedComponentIds]
+    setSelectedComponentIds([])
 
+    const updatedRootComponentConfig = { ...rootComponentConfig }
     const updatedComponentConfigs = {
       ...componentConfigs,
     }
-    const { parentComponentId } = updatedComponentConfigs[componentId]
 
-    // Remove the component from the parent's `childComponentIds`
-    // The parent can be the root component or a regular component
-    if (parentComponentId === null) {
-      const updatedRootComponentConfig = {
-        ...rootComponentConfig,
-        childComponentIds: rootComponentConfig.childComponentIds.filter(
-          (id) => id !== componentId
-        ),
+    selectedComponentIdsToDelete.forEach((componentId) => {
+      const { parentComponentId } = updatedComponentConfigs[componentId]
+
+      // If the component has already been deleted, do nothing
+      if (updatedComponentConfigs[componentId] === undefined) return
+
+      // Remove the component from the parent's `childComponentIds`
+      // The parent can be the root component or a regular component
+      if (parentComponentId === null) {
+        updatedRootComponentConfig.childComponentIds =
+          updatedRootComponentConfig.childComponentIds.filter(
+            (id) => id !== componentId
+          )
+      } else {
+        updatedComponentConfigs[parentComponentId].childComponentIds =
+          updatedComponentConfigs[parentComponentId].childComponentIds.filter(
+            (id) => id !== componentId
+          )
       }
-      setAndSaveRootComponentConfig(updatedRootComponentConfig)
-    } else {
-      updatedComponentConfigs[parentComponentId].childComponentIds =
-        componentConfigs[parentComponentId].childComponentIds.filter(
-          (id) => id !== componentId
-        )
-    }
 
-    const descendantComponentIds: Array<ComponentId> = []
-    const findDescendantComponentIds = (componentId: ComponentId) => {
-      updatedComponentConfigs[componentId].childComponentIds.forEach((id) => {
-        // Queue component for deletion
-        descendantComponentIds.unshift(id)
-        // Find remaining descendant components
-        findDescendantComponentIds(id)
-      })
-    }
-    findDescendantComponentIds(componentId)
-    descendantComponentIds.forEach((id) => delete updatedComponentConfigs[id])
+      const descendantComponentIds: Array<ComponentId> = []
+      const findDescendantComponentIds = (componentId: ComponentId) => {
+        updatedComponentConfigs[componentId].childComponentIds.forEach((id) => {
+          // Queue component for deletion
+          descendantComponentIds.unshift(id)
+          // Find remaining descendant components
+          findDescendantComponentIds(id)
+        })
+      }
+      findDescendantComponentIds(componentId)
+      descendantComponentIds.forEach((id) => delete updatedComponentConfigs[id])
 
-    delete updatedComponentConfigs[componentId]
+      delete updatedComponentConfigs[componentId]
+    })
 
+    setAndSaveRootComponentConfig(updatedRootComponentConfig)
     setAndSaveComponentConfigs(updatedComponentConfigs)
   }
 
@@ -107,18 +115,22 @@ const Home: NextPage = () => {
       return (
         <div
           key={componentId}
-          className={
-            componentId === selectedComponentId ? styles.selected : undefined
-          }
+          className={classnames({
+            [styles.selected]: selectedComponentIds.includes(componentId),
+          })}
           onClick={(event) => {
-            setSelectedComponentId(componentId)
+            if (event.metaKey) {
+              setSelectedComponentIds([...selectedComponentIds, componentId])
+            } else {
+              setSelectedComponentIds([componentId])
+            }
             event.stopPropagation()
           }}
           // Allows element to be focused, which in turn allows the element to capture key presses
           tabIndex={-1}
           onKeyDown={(event) => {
             if (event.code === 'Backspace') {
-              deleteComponent(componentId)
+              deleteSelectedComponents()
             }
           }}
         >
@@ -163,18 +175,20 @@ const Home: NextPage = () => {
             }
 
             if (
-              selectedComponentId !== null &&
+              selectedComponentIds.length === 1 &&
               drawableComponents[
-                componentConfigs[selectedComponentId].componentType
+                componentConfigs[selectedComponentIds[0]].componentType
               ].isLayoutComponent
             ) {
-              updatedComponentConfigs[selectedComponentId].childComponentIds = [
-                ...updatedComponentConfigs[selectedComponentId]
+              updatedComponentConfigs[
+                selectedComponentIds[0]
+              ].childComponentIds = [
+                ...updatedComponentConfigs[selectedComponentIds[0]]
                   .childComponentIds,
                 newComponentId,
               ]
               updatedComponentConfigs[newComponentId].parentComponentId =
-                selectedComponentId
+                selectedComponentIds[0]
             } else {
               const updatedRootComponentConfig: RootComponentConfig = {
                 ...rootComponentConfig,
@@ -206,9 +220,9 @@ const Home: NextPage = () => {
         <ComponentBrowser
           rootComponentConfig={rootComponentConfig}
           componentConfigs={componentConfigs}
-          selectedComponentId={selectedComponentId}
-          setSelectedComponentId={setSelectedComponentId}
-          deleteComponent={deleteComponent}
+          selectedComponentIds={selectedComponentIds}
+          setSelectedComponentIds={setSelectedComponentIds}
+          deleteSelectedComponents={deleteSelectedComponents}
         />
       </div>
 
@@ -216,7 +230,7 @@ const Home: NextPage = () => {
         className={styles.main}
         onClick={() => {
           // If the click gets here, a component was not clicked because `stopPropagation` is called whenever a component is clicked.
-          setSelectedComponentId(null)
+          setSelectedComponentIds([])
         }}
       >
         {renderComponents(rootComponentConfig.childComponentIds)}
@@ -224,7 +238,7 @@ const Home: NextPage = () => {
 
       <div className={styles.componentEditor}>
         <ComponentConfigEditor
-          componentId={selectedComponentId}
+          componentIds={selectedComponentIds}
           componentConfigs={componentConfigs}
           onChangeComponentConfigs={setAndSaveComponentConfigs}
         />

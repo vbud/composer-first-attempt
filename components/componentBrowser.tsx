@@ -10,18 +10,18 @@ const componentClassPrefix = 'browser-'
 export const ComponentBrowser = ({
   rootComponentConfig,
   componentConfigs,
-  selectedComponentId,
-  setSelectedComponentId,
-  deleteComponent,
+  selectedComponentIds,
+  setSelectedComponentIds,
+  deleteSelectedComponents,
 }: {
   rootComponentConfig: RootComponentConfig
   componentConfigs: SavedComponentConfigs
-  selectedComponentId: ComponentId | null
-  setSelectedComponentId: (componentId: ComponentId | null) => void
-  deleteComponent: (componentId: ComponentId) => void
+  selectedComponentIds: Array<ComponentId>
+  setSelectedComponentIds: (componentIds: Array<ComponentId>) => void
+  deleteSelectedComponents: () => void
 }) => {
   const selectComponent = (componentId: ComponentId) => {
-    setSelectedComponentId(componentId)
+    setSelectedComponentIds([componentId])
     document.querySelector(`.${componentClassPrefix}${componentId}`).focus()
   }
 
@@ -70,7 +70,7 @@ export const ComponentBrowser = ({
         children = renderComponents(childComponentIds, componentId)
       }
 
-      const isSelected = componentId === selectedComponentId
+      const isSelected = selectedComponentIds.includes(componentId)
 
       return (
         <div key={componentId} className={styles.componentWrapper}>
@@ -90,7 +90,7 @@ export const ComponentBrowser = ({
             onKeyDown={(event) => {
               switch (event.code) {
                 case 'Backspace':
-                  deleteComponent(componentId)
+                  deleteSelectedComponents()
                   break
                 case 'ArrowUp':
                   browseUp(index, parentComponentId)
