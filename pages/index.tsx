@@ -13,9 +13,9 @@ import {
   SavedComponentConfig,
 } from 'types'
 import { drawableComponents } from 'components/libraryComponents'
-import { ComponentBrowser } from 'components/componentBrowser'
-import { Canvas } from 'components/canvas'
-import { ComponentConfigEditor } from 'components/componentConfigEditor'
+import { ComponentBrowser } from 'components/ComponentBrowser'
+import { Canvas } from 'components/Canvas'
+import { ComponentConfigEditor } from 'components/ComponentConfigEditor'
 import {
   readComponentConfigs,
   saveComponentConfigs,
