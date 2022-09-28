@@ -54,13 +54,13 @@ const Home: NextPage = () => {
     const firstSelectedComponentParentId =
       componentConfigs[selectedComponentIds[0]].parentComponentId
 
-    // create a new layout component at same level as first child's parent
+    // Create a new layout component at same level as first child's parent
     const newLayoutComponentId = nanoid()
     const newLayoutComponentType = 'layoutFlex'
     const newLayoutComponentConfig: SavedComponentConfig = {
       componentType: newLayoutComponentType,
       config: drawableComponents[newLayoutComponentType].defaultConfig,
-      // add the selected components to the new layout component
+      // Add the selected components to the new layout component
       childComponentIds: [...selectedComponentIds],
       parentComponentId: firstSelectedComponentParentId,
     }
@@ -69,7 +69,7 @@ const Home: NextPage = () => {
     const [firstSelectedComponentId, ...remainingSelectedComponentIds] =
       selectedComponentIds
 
-    // replace the first selected component with the new layout component at the same position in the array
+    // Replace the first selected component with the new layout component at the same position in the array
     if (firstSelectedComponentParentId === null) {
       const index = rootComponentConfig.childComponentIds.indexOf(
         firstSelectedComponentId
@@ -84,7 +84,7 @@ const Home: NextPage = () => {
       ] = newLayoutComponentId
     }
 
-    // remove the remaining selected components from their parents
+    // Remove the remaining selected components from their parents
     if (remainingSelectedComponentIds.length > 0) {
       remainingSelectedComponentIds.forEach((componentId) => {
         const { parentComponentId } = componentConfigs[componentId]
@@ -102,15 +102,63 @@ const Home: NextPage = () => {
       })
     }
 
-    // change the components' parents to the group
+    // Change the components' parents to the group
     selectedComponentIds.forEach((componentId) => {
       componentConfigs[componentId].parentComponentId = newLayoutComponentId
     })
 
-    // update all react state
+    // Update all react state
     setAndSaveRootComponentConfig(rootComponentConfig)
     setAndSaveComponentConfigs(componentConfigs)
     setSelectedComponentIds([newLayoutComponentId])
+  }
+
+  const ungroupSelectedComponents = () => {
+    const newSelectedComponentIds: Array<ComponentId> = []
+
+    selectedComponentIds.forEach((id) => {
+      // Only ungroup layout components
+      if (
+        !drawableComponents[componentConfigs[id].componentType]
+          .isLayoutComponent
+      )
+        return
+
+      const { parentComponentId } = componentConfigs[id]
+
+      // Move child components to parent of layout component
+      componentConfigs[id].childComponentIds.forEach((childId) => {
+        componentConfigs[childId].parentComponentId = parentComponentId
+      })
+
+      // Replace the layout component with the layout component's children at the same position in the parent's array of children
+      if (parentComponentId === null) {
+        const index = rootComponentConfig.childComponentIds.indexOf(id)
+        rootComponentConfig.childComponentIds.splice(
+          index,
+          1,
+          ...componentConfigs[id].childComponentIds
+        )
+      } else {
+        const index =
+          componentConfigs[parentComponentId].childComponentIds.indexOf(id)
+        componentConfigs[parentComponentId].childComponentIds.splice(
+          index,
+          1,
+          ...componentConfigs[id].childComponentIds
+        )
+      }
+
+      // Ensure all children are selected as a result of ungrouping
+      newSelectedComponentIds.push(...componentConfigs[id].childComponentIds)
+
+      delete componentConfigs[id]
+    })
+
+    // Update all react state
+    setAndSaveRootComponentConfig(rootComponentConfig)
+    setAndSaveComponentConfigs(componentConfigs)
+    setSelectedComponentIds(newSelectedComponentIds)
   }
 
   const deleteSelectedComponents = () => {
@@ -195,6 +243,7 @@ const Home: NextPage = () => {
         setSelectedComponentIds={setSelectedComponentIds}
         deleteSelectedComponents={deleteSelectedComponents}
         groupSelectedComponents={groupSelectedComponents}
+        ungroupSelectedComponents={ungroupSelectedComponents}
       />
 
       <ComponentConfigEditor

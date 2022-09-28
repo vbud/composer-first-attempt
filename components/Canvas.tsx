@@ -12,6 +12,7 @@ export const Canvas = ({
   setSelectedComponentIds,
   deleteSelectedComponents,
   groupSelectedComponents,
+  ungroupSelectedComponents,
 }: {
   rootComponentConfig: RootComponentConfig
   componentConfigs: SavedComponentConfigs
@@ -19,6 +20,7 @@ export const Canvas = ({
   setSelectedComponentIds: (componentIds: Array<ComponentId>) => void
   deleteSelectedComponents: () => void
   groupSelectedComponents: () => void
+  ungroupSelectedComponents: () => void
 }) => {
   const renderComponents = (componentIds: Array<ComponentId>) => {
     return componentIds.map((componentId) => {
@@ -57,6 +59,8 @@ export const Canvas = ({
             event.preventDefault()
 
             if (event.code === 'Backspace') deleteSelectedComponents()
+            else if (event.code === 'KeyG' && event.metaKey && event.shiftKey)
+              ungroupSelectedComponents()
             else if (event.code === 'KeyG' && event.metaKey)
               groupSelectedComponents()
           }}
