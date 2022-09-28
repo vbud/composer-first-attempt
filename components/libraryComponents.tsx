@@ -43,7 +43,9 @@ export const drawableComponents: {
       justifyContent: 'center',
       gap: 0,
     },
-    render: (config, children) => <div style={{ ...config }}>{children}</div>,
+    render: (config, children) => (
+      <div style={{ display: 'flex', ...config }}>{children}</div>
+    ),
   },
   muiAlert: {
     defaultConfig: {

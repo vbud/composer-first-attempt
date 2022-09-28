@@ -1,12 +1,19 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import React, { useState } from 'react'
+import { nanoid } from 'nanoid'
 
-import { ComponentId, SavedComponentConfigs, RootComponentConfig } from 'types'
+import {
+  ComponentId,
+  SavedComponentConfigs,
+  RootComponentConfig,
+  SavedComponentConfig,
+} from 'types'
 import { AddComponent } from 'components/AddComponent'
 import { ComponentBrowser } from 'components/ComponentBrowser'
 import { Canvas } from 'components/Canvas'
 import { ComponentConfigEditor } from 'components/ComponentConfigEditor'
+import { drawableComponents } from 'components/libraryComponents'
 import {
   readComponentConfigs,
   saveComponentConfigs,
@@ -39,6 +46,71 @@ const Home: NextPage = () => {
   ) => {
     setComponentConfigs(updatedComponentConfigs)
     saveComponentConfigs(updatedComponentConfigs)
+  }
+
+  const groupSelectedComponents = () => {
+    if (selectedComponentIds.length === 0) return
+
+    const firstSelectedComponentParentId =
+      componentConfigs[selectedComponentIds[0]].parentComponentId
+
+    // create a new layout component at same level as first child's parent
+    const newLayoutComponentId = nanoid()
+    const newLayoutComponentType = 'layoutFlex'
+    const newLayoutComponentConfig: SavedComponentConfig = {
+      componentType: newLayoutComponentType,
+      config: drawableComponents[newLayoutComponentType].defaultConfig,
+      // add the selected components to the new layout component
+      childComponentIds: [...selectedComponentIds],
+      parentComponentId: firstSelectedComponentParentId,
+    }
+    componentConfigs[newLayoutComponentId] = newLayoutComponentConfig
+
+    const [firstSelectedComponentId, ...remainingSelectedComponentIds] =
+      selectedComponentIds
+
+    // replace the first selected component with the new layout component at the same position in the array
+    if (firstSelectedComponentParentId === null) {
+      const index = rootComponentConfig.childComponentIds.indexOf(
+        firstSelectedComponentId
+      )
+      rootComponentConfig.childComponentIds[index] = newLayoutComponentId
+    } else {
+      const index = componentConfigs[
+        firstSelectedComponentParentId
+      ].childComponentIds.indexOf(firstSelectedComponentId)
+      componentConfigs[firstSelectedComponentParentId].childComponentIds[
+        index
+      ] = newLayoutComponentId
+    }
+
+    // remove the remaining selected components from their parents
+    if (remainingSelectedComponentIds.length > 0) {
+      remainingSelectedComponentIds.forEach((componentId) => {
+        const { parentComponentId } = componentConfigs[componentId]
+        if (parentComponentId === null) {
+          rootComponentConfig.childComponentIds =
+            rootComponentConfig.childComponentIds.filter(
+              (id) => id !== componentId
+            )
+        } else {
+          componentConfigs[parentComponentId].childComponentIds =
+            componentConfigs[parentComponentId].childComponentIds.filter(
+              (id) => id !== componentId
+            )
+        }
+      })
+    }
+
+    // change the components' parents to the group
+    selectedComponentIds.forEach((componentId) => {
+      componentConfigs[componentId].parentComponentId = newLayoutComponentId
+    })
+
+    // update all react state
+    setAndSaveRootComponentConfig(rootComponentConfig)
+    setAndSaveComponentConfigs(componentConfigs)
+    setSelectedComponentIds([newLayoutComponentId])
   }
 
   const deleteSelectedComponents = () => {
@@ -122,6 +194,7 @@ const Home: NextPage = () => {
         selectedComponentIds={selectedComponentIds}
         setSelectedComponentIds={setSelectedComponentIds}
         deleteSelectedComponents={deleteSelectedComponents}
+        groupSelectedComponents={groupSelectedComponents}
       />
 
       <ComponentConfigEditor

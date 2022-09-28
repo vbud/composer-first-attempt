@@ -11,12 +11,14 @@ export const Canvas = ({
   selectedComponentIds,
   setSelectedComponentIds,
   deleteSelectedComponents,
+  groupSelectedComponents,
 }: {
   rootComponentConfig: RootComponentConfig
   componentConfigs: SavedComponentConfigs
   selectedComponentIds: Array<ComponentId>
   setSelectedComponentIds: (componentIds: Array<ComponentId>) => void
   deleteSelectedComponents: () => void
+  groupSelectedComponents: () => void
 }) => {
   const renderComponents = (componentIds: Array<ComponentId>) => {
     return componentIds.map((componentId) => {
@@ -39,19 +41,24 @@ export const Canvas = ({
             [styles.selected]: selectedComponentIds.includes(componentId),
           })}
           onClick={(event) => {
+            event.stopPropagation()
+
+            if (selectedComponentIds.includes(componentId)) return
+
             if (event.metaKey) {
               setSelectedComponentIds([...selectedComponentIds, componentId])
             } else {
               setSelectedComponentIds([componentId])
             }
-            event.stopPropagation()
           }}
           // Allows element to be focused, which in turn allows the element to capture key presses
           tabIndex={-1}
           onKeyDown={(event) => {
-            if (event.code === 'Backspace') {
-              deleteSelectedComponents()
-            }
+            event.preventDefault()
+
+            if (event.code === 'Backspace') deleteSelectedComponents()
+            else if (event.code === 'KeyG' && event.metaKey)
+              groupSelectedComponents()
           }}
         >
           {/* Ensure children do not swallow clicks */}

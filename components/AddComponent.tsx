@@ -39,7 +39,6 @@ export const AddComponent = ({
         const componentType = event.target.value as keyof ComponentConfig
 
         const newComponentId = nanoid()
-
         const newComponentConfig: SavedComponentConfig = {
           componentType,
           config: drawableComponents[componentType].defaultConfig,
