@@ -3,23 +3,13 @@ import Head from 'next/head'
 import React, { useState } from 'react'
 import { nanoid } from 'nanoid'
 
-import {
-  ComponentId,
-  SavedComponentConfigs,
-  RootComponentConfig,
-  SavedComponentConfig,
-} from 'types'
+import { ComponentId, SavedComponentConfigs, SavedComponentConfig } from 'types'
 import { AddComponent } from 'components/AddComponent'
 import { ComponentBrowser } from 'components/ComponentBrowser'
 import { Canvas } from 'components/Canvas'
 import { ComponentConfigEditor } from 'components/ComponentConfigEditor'
 import { drawableComponents } from 'components/libraryComponents'
-import {
-  readComponentConfigs,
-  saveComponentConfigs,
-  readRootComponentConfig,
-  saveRootComponentConfig,
-} from 'utils/localStorage'
+import { readComponentConfigs, saveComponentConfigs } from 'utils/localStorage'
 
 import styles from 'styles/Home.module.css'
 
@@ -27,25 +17,15 @@ const Home: NextPage = () => {
   const [componentConfigs, setComponentConfigs] =
     useState<SavedComponentConfigs>(readComponentConfigs())
 
-  const [rootComponentConfig, setRootComponentConfig] =
-    useState<RootComponentConfig>(readRootComponentConfig())
-
   const [selectedComponentIds, setSelectedComponentIds] = useState<
     Array<ComponentId>
   >([])
 
-  const setAndSaveRootComponentConfig = (
-    updatedRootComponentConfig: RootComponentConfig
-  ) => {
-    setRootComponentConfig(updatedRootComponentConfig)
-    saveRootComponentConfig(updatedRootComponentConfig)
-  }
-
   const setAndSaveComponentConfigs = (
-    updatedComponentConfigs: SavedComponentConfigs
+    componentConfigs: SavedComponentConfigs
   ) => {
-    setComponentConfigs(updatedComponentConfigs)
-    saveComponentConfigs(updatedComponentConfigs)
+    setComponentConfigs({ ...componentConfigs })
+    saveComponentConfigs(componentConfigs)
   }
 
   const groupSelectedComponents = () => {
@@ -53,6 +33,9 @@ const Home: NextPage = () => {
 
     const firstSelectedComponentParentId =
       componentConfigs[selectedComponentIds[0]].parentComponentId
+
+    // Root component is not selectable, so in practice this should never happen
+    if (firstSelectedComponentParentId === null) return
 
     // Create a new layout component at same level as first child's parent
     const newLayoutComponentId = nanoid()
@@ -70,35 +53,23 @@ const Home: NextPage = () => {
       selectedComponentIds
 
     // Replace the first selected component with the new layout component at the same position in the array
-    if (firstSelectedComponentParentId === null) {
-      const index = rootComponentConfig.childComponentIds.indexOf(
-        firstSelectedComponentId
-      )
-      rootComponentConfig.childComponentIds[index] = newLayoutComponentId
-    } else {
-      const index = componentConfigs[
-        firstSelectedComponentParentId
-      ].childComponentIds.indexOf(firstSelectedComponentId)
-      componentConfigs[firstSelectedComponentParentId].childComponentIds[
-        index
-      ] = newLayoutComponentId
-    }
+    const index = componentConfigs[
+      firstSelectedComponentParentId
+    ].childComponentIds.indexOf(firstSelectedComponentId)
+    componentConfigs[firstSelectedComponentParentId].childComponentIds[index] =
+      newLayoutComponentId
 
     // Remove the remaining selected components from their parents
     if (remainingSelectedComponentIds.length > 0) {
       remainingSelectedComponentIds.forEach((componentId) => {
         const { parentComponentId } = componentConfigs[componentId]
-        if (parentComponentId === null) {
-          rootComponentConfig.childComponentIds =
-            rootComponentConfig.childComponentIds.filter(
-              (id) => id !== componentId
-            )
-        } else {
-          componentConfigs[parentComponentId].childComponentIds =
-            componentConfigs[parentComponentId].childComponentIds.filter(
-              (id) => id !== componentId
-            )
-        }
+        // Root component is not selectable, so in practice this should never happen
+        if (parentComponentId === null) return
+
+        componentConfigs[parentComponentId].childComponentIds =
+          componentConfigs[parentComponentId].childComponentIds.filter(
+            (id) => id !== componentId
+          )
       })
     }
 
@@ -108,7 +79,6 @@ const Home: NextPage = () => {
     })
 
     // Update all react state
-    setAndSaveRootComponentConfig(rootComponentConfig)
     setAndSaveComponentConfigs(componentConfigs)
     setSelectedComponentIds([newLayoutComponentId])
   }
@@ -126,28 +96,22 @@ const Home: NextPage = () => {
 
       const { parentComponentId } = componentConfigs[id]
 
+      // Root component is not selectable, so in practice this should never happen
+      if (parentComponentId === null) return
+
       // Move child components to parent of layout component
       componentConfigs[id].childComponentIds.forEach((childId) => {
         componentConfigs[childId].parentComponentId = parentComponentId
       })
 
       // Replace the layout component with the layout component's children at the same position in the parent's array of children
-      if (parentComponentId === null) {
-        const index = rootComponentConfig.childComponentIds.indexOf(id)
-        rootComponentConfig.childComponentIds.splice(
-          index,
-          1,
-          ...componentConfigs[id].childComponentIds
-        )
-      } else {
-        const index =
-          componentConfigs[parentComponentId].childComponentIds.indexOf(id)
-        componentConfigs[parentComponentId].childComponentIds.splice(
-          index,
-          1,
-          ...componentConfigs[id].childComponentIds
-        )
-      }
+      const index =
+        componentConfigs[parentComponentId].childComponentIds.indexOf(id)
+      componentConfigs[parentComponentId].childComponentIds.splice(
+        index,
+        1,
+        ...componentConfigs[id].childComponentIds
+      )
 
       // Ensure all children are selected as a result of ungrouping
       newSelectedComponentIds.push(...componentConfigs[id].childComponentIds)
@@ -156,7 +120,6 @@ const Home: NextPage = () => {
     })
 
     // Update all react state
-    setAndSaveRootComponentConfig(rootComponentConfig)
     setAndSaveComponentConfigs(componentConfigs)
     setSelectedComponentIds(newSelectedComponentIds)
   }
@@ -165,22 +128,16 @@ const Home: NextPage = () => {
     selectedComponentIds.forEach((componentId) => {
       const { parentComponentId } = componentConfigs[componentId]
 
+      // Root component is not selectable, so in practice this should never happen
+      if (parentComponentId === null) return
+
       // If the component has already been deleted, do nothing
       if (componentConfigs[componentId] === undefined) return
 
       // Remove the component from the parent's `childComponentIds`
-      // The parent can be the root component or a regular component
-      if (parentComponentId === null) {
-        rootComponentConfig.childComponentIds =
-          rootComponentConfig.childComponentIds.filter(
-            (id) => id !== componentId
-          )
-      } else {
-        componentConfigs[parentComponentId].childComponentIds =
-          componentConfigs[parentComponentId].childComponentIds.filter(
-            (id) => id !== componentId
-          )
-      }
+      componentConfigs[parentComponentId].childComponentIds = componentConfigs[
+        parentComponentId
+      ].childComponentIds.filter((id) => id !== componentId)
 
       // Find and delete all descendants
       const descendantComponentIds: Array<ComponentId> = []
@@ -200,7 +157,6 @@ const Home: NextPage = () => {
 
     // Update all react state
     setSelectedComponentIds([])
-    setAndSaveRootComponentConfig(rootComponentConfig)
     setAndSaveComponentConfigs(componentConfigs)
   }
 
@@ -239,14 +195,11 @@ const Home: NextPage = () => {
         <AddComponent
           componentConfigs={componentConfigs}
           selectedComponentIds={selectedComponentIds}
-          rootComponentConfig={rootComponentConfig}
           setAndSaveComponentConfigs={setAndSaveComponentConfigs}
-          setAndSaveRootComponentConfig={setAndSaveRootComponentConfig}
         />
       </div>
 
       <ComponentBrowser
-        rootComponentConfig={rootComponentConfig}
         componentConfigs={componentConfigs}
         selectedComponentIds={selectedComponentIds}
         setSelectedComponentIds={setSelectedComponentIds}
@@ -255,7 +208,6 @@ const Home: NextPage = () => {
       />
 
       <Canvas
-        rootComponentConfig={rootComponentConfig}
         componentConfigs={componentConfigs}
         selectedComponentIds={selectedComponentIds}
         setSelectedComponentIds={setSelectedComponentIds}

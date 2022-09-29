@@ -1,19 +1,17 @@
 import classnames from 'classnames'
 
-import { ComponentId, RootComponentConfig, SavedComponentConfigs } from 'types'
+import { ComponentId, rootComponentId, SavedComponentConfigs } from 'types'
 import { drawableComponents } from 'components/libraryComponents'
 
 import styles from 'styles/ComponentBrowser.module.css'
 
 export const ComponentBrowser = ({
-  rootComponentConfig,
   componentConfigs,
   selectedComponentIds,
   setSelectedComponentIds,
   onKeyDown,
   onClickComponent,
 }: {
-  rootComponentConfig: RootComponentConfig
   componentConfigs: SavedComponentConfigs
   selectedComponentIds: Array<ComponentId>
   setSelectedComponentIds: (componentIds: Array<ComponentId>) => void
@@ -36,10 +34,11 @@ export const ComponentBrowser = ({
 
     const componentConfig = componentConfigs[startingComponentId]
     const { parentComponentId } = componentConfig
-    const parentConfig =
-      parentComponentId === null
-        ? rootComponentConfig
-        : componentConfigs[parentComponentId]
+
+    // Root component is not selectable, so in practice this should never happen
+    if (parentComponentId === null) return
+
+    const parentConfig = componentConfigs[parentComponentId]
     const index = parentConfig.childComponentIds.indexOf(startingComponentId)
 
     if (direction === 'up') {
@@ -68,19 +67,19 @@ export const ComponentBrowser = ({
         // Otherwise, if next sibling exists, go to it
         selectComponent(parentConfig.childComponentIds[index + 1])
       } else if (
-        // Otherwise, if this is the last child of its siblings, not at the root level, move to the parent's next sibling
+        // Otherwise, if this is the last child of its siblings
         index === parentConfig.childComponentIds.length - 1 &&
-        parentComponentId !== null
+        parentComponentId !== rootComponentId
       ) {
         const grandparentId =
           componentConfigs[parentComponentId].parentComponentId
-        const grandparentConfig =
-          grandparentId === null
-            ? rootComponentConfig
-            : componentConfigs[grandparentId]
-        const parentIndex =
-          grandparentConfig.childComponentIds.indexOf(parentComponentId)
-        selectComponent(grandparentConfig.childComponentIds[parentIndex + 1])
+        // Move to the parent's next sibling, unless the parent is the root component, in which case do nothing
+        if (grandparentId !== null) {
+          const grandparentConfig = componentConfigs[grandparentId]
+          const parentIndex =
+            grandparentConfig.childComponentIds.indexOf(parentComponentId)
+          selectComponent(grandparentConfig.childComponentIds[parentIndex + 1])
+        }
       }
     }
   }
@@ -131,7 +130,8 @@ export const ComponentBrowser = ({
       }}
       className={styles.root}
     >
-      {renderComponents(rootComponentConfig.childComponentIds)}
+      {componentConfigs[rootComponentId] &&
+        renderComponents(componentConfigs[rootComponentId].childComponentIds)}
     </div>
   )
 }

@@ -3,9 +3,9 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 
 import {
+  rootComponentId,
   ComponentConfig,
   ComponentId,
-  RootComponentConfig,
   SavedComponentConfig,
   SavedComponentConfigs,
 } from 'types'
@@ -15,19 +15,13 @@ import styles from 'styles/AddComponent.module.css'
 
 export const AddComponent = ({
   componentConfigs,
-  rootComponentConfig,
   selectedComponentIds,
-  setAndSaveRootComponentConfig,
   setAndSaveComponentConfigs,
 }: {
   componentConfigs: SavedComponentConfigs
-  rootComponentConfig: RootComponentConfig
   selectedComponentIds: Array<ComponentId>
-  setAndSaveRootComponentConfig: (
-    rootComponentConfig: RootComponentConfig
-  ) => void
   setAndSaveComponentConfigs: (
-    rootComponentConfig: SavedComponentConfigs
+    setComponentConfigs: SavedComponentConfigs
   ) => void
 }) => {
   return (
@@ -36,46 +30,41 @@ export const AddComponent = ({
       size="small"
       value=""
       onChange={(event) => {
+        // Initialize root component if it does not exist
+        if (componentConfigs[rootComponentId] === undefined) {
+          componentConfigs[rootComponentId] = {
+            componentType: rootComponentId,
+            config: {},
+            childComponentIds: [],
+            parentComponentId: null,
+          }
+        }
+
         const componentType = event.target.value as keyof ComponentConfig
+
+        const parentComponentId =
+          selectedComponentIds.length === 1 &&
+          drawableComponents[
+            componentConfigs[selectedComponentIds[0]].componentType
+          ].isLayoutComponent
+            ? selectedComponentIds[0]
+            : rootComponentId
 
         const newComponentId = nanoid()
         const newComponentConfig: SavedComponentConfig = {
           componentType,
           config: drawableComponents[componentType].defaultConfig,
           childComponentIds: [],
-          parentComponentId: null,
+          parentComponentId,
         }
 
-        const updatedComponentConfigs = {
-          ...componentConfigs,
-          [newComponentId]: newComponentConfig,
-        }
+        componentConfigs[newComponentId] = newComponentConfig
 
-        if (
-          selectedComponentIds.length === 1 &&
-          drawableComponents[
-            componentConfigs[selectedComponentIds[0]].componentType
-          ].isLayoutComponent
-        ) {
-          updatedComponentConfigs[selectedComponentIds[0]].childComponentIds = [
-            ...updatedComponentConfigs[selectedComponentIds[0]]
-              .childComponentIds,
-            newComponentId,
-          ]
-          updatedComponentConfigs[newComponentId].parentComponentId =
-            selectedComponentIds[0]
-        } else {
-          const updatedRootComponentConfig: RootComponentConfig = {
-            ...rootComponentConfig,
-            childComponentIds: [
-              ...rootComponentConfig.childComponentIds,
-              newComponentId,
-            ],
-          }
-          setAndSaveRootComponentConfig(updatedRootComponentConfig)
-        }
+        componentConfigs[parentComponentId].childComponentIds.push(
+          newComponentId
+        )
 
-        setAndSaveComponentConfigs(updatedComponentConfigs)
+        setAndSaveComponentConfigs(componentConfigs)
       }}
     >
       {Object.keys(drawableComponents)

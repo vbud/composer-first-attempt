@@ -1,19 +1,17 @@
 import classnames from 'classnames'
 
-import { ComponentId, RootComponentConfig, SavedComponentConfigs } from 'types'
+import { ComponentId, rootComponentId, SavedComponentConfigs } from 'types'
 import { drawableComponents } from 'components/libraryComponents'
 
 import styles from 'styles/Canvas.module.css'
 
 export const Canvas = ({
-  rootComponentConfig,
   componentConfigs,
   selectedComponentIds,
   setSelectedComponentIds,
   onClickComponent,
   onKeyDown,
 }: {
-  rootComponentConfig: RootComponentConfig
   componentConfigs: SavedComponentConfigs
   selectedComponentIds: Array<ComponentId>
   setSelectedComponentIds: (componentIds: Array<ComponentId>) => void
@@ -65,7 +63,8 @@ export const Canvas = ({
         setSelectedComponentIds([])
       }}
     >
-      {renderComponents(rootComponentConfig.childComponentIds)}
+      {componentConfigs[rootComponentId] &&
+        renderComponents(componentConfigs[rootComponentId].childComponentIds)}
     </div>
   )
 }

@@ -2,6 +2,8 @@ import { muiIcons } from 'components/icons'
 
 export type ComponentId = string
 
+export const rootComponentId = '__root__'
+
 type ComponentConfigDefinition =
   | {
       type: 'string'
@@ -203,7 +205,7 @@ export type ComponentConfig = {
 }
 
 export type SavedComponentConfig = {
-  componentType: keyof ComponentConfig
+  componentType: keyof ComponentConfig | typeof rootComponentId
   config: ComponentConfig[keyof ComponentConfig]
   childComponentIds: Array<ComponentId>
   parentComponentId: ComponentId | null
@@ -211,9 +213,4 @@ export type SavedComponentConfig = {
 
 export type SavedComponentConfigs = {
   [key: ComponentId]: SavedComponentConfig
-}
-
-export type RootComponentConfig = {
-  config: {}
-  childComponentIds: Array<ComponentId>
 }
