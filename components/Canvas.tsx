@@ -53,17 +53,6 @@ export const Canvas = ({
               setSelectedComponentIds([componentId])
             }
           }}
-          // Allows element to be focused, which in turn allows the element to capture key presses
-          tabIndex={-1}
-          onKeyDown={(event) => {
-            event.preventDefault()
-
-            if (event.code === 'Backspace') deleteSelectedComponents()
-            else if (event.code === 'KeyG' && event.metaKey && event.shiftKey)
-              ungroupSelectedComponents()
-            else if (event.code === 'KeyG' && event.metaKey)
-              groupSelectedComponents()
-          }}
         >
           {/* Ensure children do not swallow clicks */}
           <div style={{ pointerEvents: 'none' }}>
@@ -77,6 +66,17 @@ export const Canvas = ({
   return (
     <div
       className={styles.root}
+      // Allows element to be focused, which in turn allows the element to capture key presses
+      tabIndex={-1}
+      onKeyDown={(event) => {
+        event.preventDefault()
+
+        if (event.code === 'Backspace') deleteSelectedComponents()
+        else if (event.code === 'KeyG' && event.metaKey && event.shiftKey)
+          ungroupSelectedComponents()
+        else if (event.code === 'KeyG' && event.metaKey)
+          groupSelectedComponents()
+      }}
       onClick={() => {
         // If the click gets here, a component was not clicked because `stopPropagation` is called whenever a component is clicked.
         setSelectedComponentIds([])

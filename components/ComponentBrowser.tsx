@@ -128,6 +128,8 @@ export const ComponentBrowser = ({
       // Allows element to be focused, which in turn allows the element to capture key presses
       tabIndex={-1}
       onKeyDown={(event) => {
+        event.preventDefault()
+
         switch (event.code) {
           case 'Backspace':
             deleteSelectedComponents()
