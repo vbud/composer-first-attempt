@@ -5,24 +5,23 @@ import { drawableComponents } from 'components/libraryComponents'
 
 import styles from 'styles/ComponentBrowser.module.css'
 
-const componentClassPrefix = 'browser-'
-
 export const ComponentBrowser = ({
   rootComponentConfig,
   componentConfigs,
   selectedComponentIds,
   setSelectedComponentIds,
-  deleteSelectedComponents,
+  onKeyDown,
+  onClickComponent,
 }: {
   rootComponentConfig: RootComponentConfig
   componentConfigs: SavedComponentConfigs
   selectedComponentIds: Array<ComponentId>
   setSelectedComponentIds: (componentIds: Array<ComponentId>) => void
-  deleteSelectedComponents: () => void
+  onClickComponent: (componentId: ComponentId, event: React.MouseEvent) => void
+  onKeyDown: (event: React.KeyboardEvent) => void
 }) => {
   const selectComponent = (componentId: ComponentId) => {
     setSelectedComponentIds([componentId])
-    document.querySelector(`.${componentClassPrefix}${componentId}`).focus()
   }
 
   const move = (direction: 'up' | 'down') => {
@@ -104,15 +103,11 @@ export const ComponentBrowser = ({
       return (
         <div key={componentId} className={styles.componentWrapper}>
           <div
-            className={classnames(
-              styles.component,
-              `${componentClassPrefix}${componentId}`,
-              {
-                [styles.selected]: isSelected,
-              }
-            )}
-            onClick={() => {
-              selectComponent(componentId)
+            className={classnames(styles.component, {
+              [styles.selected]: isSelected,
+            })}
+            onClick={(event) => {
+              onClickComponent(componentId, event)
             }}
           >
             {componentType}
@@ -130,17 +125,9 @@ export const ComponentBrowser = ({
       onKeyDown={(event) => {
         event.preventDefault()
 
-        switch (event.code) {
-          case 'Backspace':
-            deleteSelectedComponents()
-            break
-          case 'ArrowUp':
-            move('up')
-            break
-          case 'ArrowDown':
-            move('down')
-            break
-        }
+        if (event.code === 'ArrowUp') move('up')
+        else if (event.code === 'ArrowDown') move('down')
+        else onKeyDown(event)
       }}
       className={styles.root}
     >

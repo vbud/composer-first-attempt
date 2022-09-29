@@ -10,17 +10,15 @@ export const Canvas = ({
   componentConfigs,
   selectedComponentIds,
   setSelectedComponentIds,
-  deleteSelectedComponents,
-  groupSelectedComponents,
-  ungroupSelectedComponents,
+  onClickComponent,
+  onKeyDown,
 }: {
   rootComponentConfig: RootComponentConfig
   componentConfigs: SavedComponentConfigs
   selectedComponentIds: Array<ComponentId>
   setSelectedComponentIds: (componentIds: Array<ComponentId>) => void
-  deleteSelectedComponents: () => void
-  groupSelectedComponents: () => void
-  ungroupSelectedComponents: () => void
+  onClickComponent: (componentId: ComponentId, event: React.MouseEvent) => void
+  onKeyDown: (event: React.KeyboardEvent) => void
 }) => {
   const renderComponents = (componentIds: Array<ComponentId>) => {
     return componentIds.map((componentId) => {
@@ -44,14 +42,7 @@ export const Canvas = ({
           })}
           onClick={(event) => {
             event.stopPropagation()
-
-            if (selectedComponentIds.includes(componentId)) return
-
-            if (event.metaKey) {
-              setSelectedComponentIds([...selectedComponentIds, componentId])
-            } else {
-              setSelectedComponentIds([componentId])
-            }
+            onClickComponent(componentId, event)
           }}
         >
           {/* Ensure children do not swallow clicks */}
@@ -68,15 +59,7 @@ export const Canvas = ({
       className={styles.root}
       // Allows element to be focused, which in turn allows the element to capture key presses
       tabIndex={-1}
-      onKeyDown={(event) => {
-        event.preventDefault()
-
-        if (event.code === 'Backspace') deleteSelectedComponents()
-        else if (event.code === 'KeyG' && event.metaKey && event.shiftKey)
-          ungroupSelectedComponents()
-        else if (event.code === 'KeyG' && event.metaKey)
-          groupSelectedComponents()
-      }}
+      onKeyDown={onKeyDown}
       onClick={() => {
         // If the click gets here, a component was not clicked because `stopPropagation` is called whenever a component is clicked.
         setSelectedComponentIds([])

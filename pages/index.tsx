@@ -209,6 +209,28 @@ const Home: NextPage = () => {
     setAndSaveComponentConfigs(updatedComponentConfigs)
   }
 
+  const onClickComponent = (
+    componentId: ComponentId,
+    event: React.MouseEvent
+  ) => {
+    if (selectedComponentIds.includes(componentId)) return
+
+    if (event.metaKey) {
+      setSelectedComponentIds([...selectedComponentIds, componentId])
+    } else {
+      setSelectedComponentIds([componentId])
+    }
+  }
+
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    event.preventDefault()
+
+    if (event.code === 'Backspace') deleteSelectedComponents()
+    else if (event.code === 'KeyG' && event.metaKey && event.shiftKey)
+      ungroupSelectedComponents()
+    else if (event.code === 'KeyG' && event.metaKey) groupSelectedComponents()
+  }
+
   return (
     <div className={styles.root}>
       <Head>
@@ -233,7 +255,8 @@ const Home: NextPage = () => {
         componentConfigs={componentConfigs}
         selectedComponentIds={selectedComponentIds}
         setSelectedComponentIds={setSelectedComponentIds}
-        deleteSelectedComponents={deleteSelectedComponents}
+        onClickComponent={onClickComponent}
+        onKeyDown={onKeyDown}
       />
 
       <Canvas
@@ -241,9 +264,8 @@ const Home: NextPage = () => {
         componentConfigs={componentConfigs}
         selectedComponentIds={selectedComponentIds}
         setSelectedComponentIds={setSelectedComponentIds}
-        deleteSelectedComponents={deleteSelectedComponents}
-        groupSelectedComponents={groupSelectedComponents}
-        ungroupSelectedComponents={ungroupSelectedComponents}
+        onClickComponent={onClickComponent}
+        onKeyDown={onKeyDown}
       />
 
       <ComponentConfigEditor
