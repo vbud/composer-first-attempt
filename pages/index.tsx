@@ -162,51 +162,46 @@ const Home: NextPage = () => {
   }
 
   const deleteSelectedComponents = () => {
-    const selectedComponentIdsToDelete = [...selectedComponentIds]
-    setSelectedComponentIds([])
-
-    const updatedRootComponentConfig = { ...rootComponentConfig }
-    const updatedComponentConfigs = {
-      ...componentConfigs,
-    }
-
-    selectedComponentIdsToDelete.forEach((componentId) => {
-      const { parentComponentId } = updatedComponentConfigs[componentId]
+    selectedComponentIds.forEach((componentId) => {
+      const { parentComponentId } = componentConfigs[componentId]
 
       // If the component has already been deleted, do nothing
-      if (updatedComponentConfigs[componentId] === undefined) return
+      if (componentConfigs[componentId] === undefined) return
 
       // Remove the component from the parent's `childComponentIds`
       // The parent can be the root component or a regular component
       if (parentComponentId === null) {
-        updatedRootComponentConfig.childComponentIds =
-          updatedRootComponentConfig.childComponentIds.filter(
+        rootComponentConfig.childComponentIds =
+          rootComponentConfig.childComponentIds.filter(
             (id) => id !== componentId
           )
       } else {
-        updatedComponentConfigs[parentComponentId].childComponentIds =
-          updatedComponentConfigs[parentComponentId].childComponentIds.filter(
+        componentConfigs[parentComponentId].childComponentIds =
+          componentConfigs[parentComponentId].childComponentIds.filter(
             (id) => id !== componentId
           )
       }
 
+      // Find and delete all descendants
       const descendantComponentIds: Array<ComponentId> = []
       const findDescendantComponentIds = (componentId: ComponentId) => {
-        updatedComponentConfigs[componentId].childComponentIds.forEach((id) => {
-          // Queue component for deletion
+        componentConfigs[componentId].childComponentIds.forEach((id) => {
+          // Add component to deletion queue
           descendantComponentIds.unshift(id)
           // Find remaining descendant components
           findDescendantComponentIds(id)
         })
       }
       findDescendantComponentIds(componentId)
-      descendantComponentIds.forEach((id) => delete updatedComponentConfigs[id])
+      descendantComponentIds.forEach((id) => delete componentConfigs[id])
 
-      delete updatedComponentConfigs[componentId]
+      delete componentConfigs[componentId]
     })
 
-    setAndSaveRootComponentConfig(updatedRootComponentConfig)
-    setAndSaveComponentConfigs(updatedComponentConfigs)
+    // Update all react state
+    setSelectedComponentIds([])
+    setAndSaveRootComponentConfig(rootComponentConfig)
+    setAndSaveComponentConfigs(componentConfigs)
   }
 
   const onClickComponent = (
