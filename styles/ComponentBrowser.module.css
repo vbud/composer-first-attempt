@@ -3,6 +3,7 @@
   border-right: 1px solid lightgray;
   padding: 1rem;
   padding-left: 0;
+  outline: none;
 }
 
 .componentWrapper {
