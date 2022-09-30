@@ -25,7 +25,6 @@ import TextField from '@mui/material/TextField'
 import { ComponentConfig } from 'types'
 import { muiIcons } from './icons'
 
-// TODO: resolve ts situation here
 export const drawableComponents: {
   [Property in keyof ComponentConfig]: {
     isLayoutComponent?: boolean

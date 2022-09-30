@@ -25,6 +25,36 @@ type ComponentConfigDefinition =
       type: 'customListOfLists'
     }
 
+const predefinedListOptions = {
+  layoutFlex: {
+    flexDirection: ['row', 'row-reverse', 'column', 'column-reverse'] as const,
+    alignItems: [
+      'flex-start',
+      'center',
+      'flex-end',
+      'stretch',
+      'baseline',
+    ] as const,
+    justifyContent: [
+      'flex-start',
+      'center',
+      'flex-end',
+      'space-between',
+      'space-around',
+      'space-evenly',
+    ] as const,
+  },
+  muiAlert: {
+    severity: ['success', 'info', 'warning', 'error'] as const,
+  },
+  muiButtonGroup: {
+    variant: ['outlined', 'contained', 'text'] as const,
+  },
+  muiIcon: {
+    name: Object.keys(muiIcons),
+  },
+}
+
 export const componentConfigDefinitions: {
   [P1 in keyof ComponentConfig]: {
     [P2 in keyof ComponentConfig[P1]]: ComponentConfigDefinition
@@ -33,22 +63,15 @@ export const componentConfigDefinitions: {
   layoutFlex: {
     flexDirection: {
       type: 'predefinedList',
-      options: ['row', 'row-reverse', 'column', 'column-reverse'],
+      options: predefinedListOptions.layoutFlex.flexDirection,
     },
     alignItems: {
       type: 'predefinedList',
-      options: ['flex-start', 'center', 'flex-end', 'stretch', 'baseline'],
+      options: predefinedListOptions.layoutFlex.alignItems,
     },
     justifyContent: {
       type: 'predefinedList',
-      options: [
-        'flex-start',
-        'center',
-        'flex-end',
-        'space-between',
-        'space-around',
-        'space-evenly',
-      ],
+      options: predefinedListOptions.layoutFlex.justifyContent,
     },
     gap: {
       type: 'number',
@@ -57,7 +80,7 @@ export const componentConfigDefinitions: {
   muiAlert: {
     severity: {
       type: 'predefinedList',
-      options: ['success', 'info', 'warning', 'error'] as const,
+      options: predefinedListOptions.muiAlert.severity,
     },
     content: {
       type: 'string',
@@ -79,7 +102,7 @@ export const componentConfigDefinitions: {
   muiButtonGroup: {
     variant: {
       type: 'predefinedList',
-      options: ['outlined', 'contained', 'text'] as const,
+      options: predefinedListOptions.muiButtonGroup.variant,
     },
     buttons: {
       type: 'customList',
@@ -93,7 +116,7 @@ export const componentConfigDefinitions: {
   muiIcon: {
     name: {
       type: 'predefinedList',
-      options: Object.keys(muiIcons),
+      options: predefinedListOptions.muiIcon.name,
     },
   },
   muiList: {
@@ -150,26 +173,32 @@ export const componentConfigDefinitions: {
 }
 
 export type ComponentConfig = {
+  layoutFlex: {
+    flexDirection: typeof predefinedListOptions.layoutFlex.flexDirection[number]
+    alignItems: typeof predefinedListOptions.layoutFlex.alignItems[number]
+    justifyContent: typeof predefinedListOptions.layoutFlex.justifyContent[number]
+    gap: number
+  }
   muiAlert: {
-    severity: typeof componentConfigDefinitions.muiAlert.severity.options[number]
+    severity: typeof predefinedListOptions.muiAlert.severity[number]
     content: string
   }
   muiAutocomplete: {
     textFieldLabel: string
-    options: ReadonlyArray<string>
+    options: Array<string>
   }
   muiButton: {
     content: string
   }
   muiButtonGroup: {
-    variant: typeof componentConfigDefinitions.muiButtonGroup.variant.options[number]
+    variant: typeof predefinedListOptions.muiButtonGroup.variant[number]
     buttons: Array<string>
   }
   muiCheckbox: {
     checked: boolean
   }
   muiIcon: {
-    name: typeof componentConfigDefinitions.muiIcon.name.options[number]
+    name: keyof typeof muiIcons
   }
   muiList: {
     dense: boolean
@@ -183,12 +212,6 @@ export type ComponentConfig = {
   muiSelect: {
     value: string
     options: Array<string>
-  }
-  layoutFlex: {
-    flexDirection: typeof componentConfigDefinitions.layoutFlex.flexDirection.options[number]
-    alignItems: typeof componentConfigDefinitions.layoutFlex.alignItems.options[number]
-    justifyContent: typeof componentConfigDefinitions.layoutFlex.justifyContent.options[number]
-    gap: number
   }
   muiTable: {
     columnNames: Array<string>
@@ -205,12 +228,17 @@ export type ComponentConfig = {
 }
 
 export type SavedComponentConfig = {
-  componentType: keyof ComponentConfig | typeof rootComponentId
+  componentType: keyof ComponentConfig
   config: ComponentConfig[keyof ComponentConfig]
-  childComponentIds: Array<ComponentId>
-  parentComponentId: ComponentId | null
+  childComponentIds?: Array<ComponentId>
+  parentComponentId: ComponentId
 }
 
 export type SavedComponentConfigs = {
   [key: ComponentId]: SavedComponentConfig
+} & {
+  [rootComponentId]: {
+    childComponentIds: Array<ComponentId>
+    parentComponentId: '__null__'
+  }
 }

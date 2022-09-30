@@ -35,10 +35,11 @@ export const ComponentBrowser = ({
     const componentConfig = componentConfigs[startingComponentId]
     const { parentComponentId } = componentConfig
 
-    // Root component is not selectable, so in practice this should never happen
-    if (parentComponentId === null) return
-
     const parentConfig = componentConfigs[parentComponentId]
+
+    // All parents of children by definition have children, so just keeping typescript happy here
+    if (!parentConfig.childComponentIds) return
+
     const index = parentConfig.childComponentIds.indexOf(startingComponentId)
 
     if (direction === 'up') {
@@ -49,7 +50,7 @@ export const ComponentBrowser = ({
         const previousSiblingId = parentConfig.childComponentIds[index - 1]
         const previousSiblingChildIds =
           componentConfigs[previousSiblingId].childComponentIds
-        if (previousSiblingChildIds.length > 0) {
+        if (previousSiblingChildIds && previousSiblingChildIds.length > 0) {
           // If previous sibling has children, move to its last child
           selectComponent(
             previousSiblingChildIds[previousSiblingChildIds.length - 1]
@@ -60,7 +61,10 @@ export const ComponentBrowser = ({
         }
       }
     } else if (direction === 'down') {
-      if (componentConfig.childComponentIds.length > 0) {
+      if (
+        componentConfig.childComponentIds &&
+        componentConfig.childComponentIds.length > 0
+      ) {
         // If component has children, go down a level to the first child
         selectComponent(componentConfig.childComponentIds[0])
       } else if (index < parentConfig.childComponentIds.length - 1) {
@@ -76,9 +80,15 @@ export const ComponentBrowser = ({
         // Move to the parent's next sibling, unless the parent is the root component, in which case do nothing
         if (grandparentId !== null) {
           const grandparentConfig = componentConfigs[grandparentId]
-          const parentIndex =
-            grandparentConfig.childComponentIds.indexOf(parentComponentId)
-          selectComponent(grandparentConfig.childComponentIds[parentIndex + 1])
+
+          // All parents of children by definition have children, so just keeping typescript happy here
+          if (grandparentConfig.childComponentIds) {
+            const parentIndex =
+              grandparentConfig.childComponentIds.indexOf(parentComponentId)
+            selectComponent(
+              grandparentConfig.childComponentIds[parentIndex + 1]
+            )
+          }
         }
       }
     }

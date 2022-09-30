@@ -33,10 +33,8 @@ export const AddComponent = ({
         // Initialize root component if it does not exist
         if (componentConfigs[rootComponentId] === undefined) {
           componentConfigs[rootComponentId] = {
-            componentType: rootComponentId,
-            config: {},
             childComponentIds: [],
-            parentComponentId: null,
+            parentComponentId: '__null__',
           }
         }
 
@@ -44,9 +42,7 @@ export const AddComponent = ({
 
         const parentComponentId =
           selectedComponentIds.length === 1 &&
-          drawableComponents[
-            componentConfigs[selectedComponentIds[0]].componentType
-          ].isLayoutComponent
+          componentConfigs[selectedComponentIds[0]].childComponentIds
             ? selectedComponentIds[0]
             : rootComponentId
 
@@ -60,7 +56,7 @@ export const AddComponent = ({
 
         componentConfigs[newComponentId] = newComponentConfig
 
-        componentConfigs[parentComponentId].childComponentIds.push(
+        componentConfigs[parentComponentId].childComponentIds?.push(
           newComponentId
         )
 
@@ -70,7 +66,8 @@ export const AddComponent = ({
       {Object.keys(drawableComponents)
         .filter(
           (componentName) =>
-            !drawableComponents[componentName].isLayoutComponent
+            !drawableComponents[componentName as keyof ComponentConfig]
+              .isLayoutComponent
         )
         .map((componentName) => (
           <MenuItem value={componentName} key={componentName}>

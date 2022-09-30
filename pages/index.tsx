@@ -34,9 +34,6 @@ const Home: NextPage = () => {
     const firstSelectedComponentParentId =
       componentConfigs[selectedComponentIds[0]].parentComponentId
 
-    // Root component is not selectable, so in practice this should never happen
-    if (firstSelectedComponentParentId === null) return
-
     // Create a new layout component at same level as first child's parent
     const newLayoutComponentId = nanoid()
     const newLayoutComponentType = 'layoutFlex'
@@ -53,21 +50,20 @@ const Home: NextPage = () => {
       selectedComponentIds
 
     // Replace the first selected component with the new layout component at the same position in the array
-    const index = componentConfigs[
-      firstSelectedComponentParentId
-    ].childComponentIds.indexOf(firstSelectedComponentId)
-    componentConfigs[firstSelectedComponentParentId].childComponentIds[index] =
-      newLayoutComponentId
+    const siblingIds =
+      componentConfigs[firstSelectedComponentParentId].childComponentIds
+    // This will always be true in practice, just appeasing typescript
+    if (siblingIds) {
+      siblingIds[siblingIds.indexOf(firstSelectedComponentId)] =
+        newLayoutComponentId
+    }
 
     // Remove the remaining selected components from their parents
     if (remainingSelectedComponentIds.length > 0) {
       remainingSelectedComponentIds.forEach((componentId) => {
         const { parentComponentId } = componentConfigs[componentId]
-        // Root component is not selectable, so in practice this should never happen
-        if (parentComponentId === null) return
-
         componentConfigs[parentComponentId].childComponentIds =
-          componentConfigs[parentComponentId].childComponentIds.filter(
+          componentConfigs[parentComponentId].childComponentIds?.filter(
             (id) => id !== componentId
           )
       })
@@ -88,35 +84,26 @@ const Home: NextPage = () => {
 
     selectedComponentIds.forEach((id) => {
       // Only ungroup layout components
-      if (
-        !drawableComponents[componentConfigs[id].componentType]
-          .isLayoutComponent
-      )
-        return
+      const { childComponentIds, parentComponentId } = componentConfigs[id]
+      if (childComponentIds) {
+        // Move child components to parent of layout component
+        childComponentIds.forEach((childId) => {
+          componentConfigs[childId].parentComponentId = parentComponentId
+        })
 
-      const { parentComponentId } = componentConfigs[id]
+        // Replace the layout component with the layout component's children at the same position in the parent's array of children
+        const siblingIds = componentConfigs[parentComponentId].childComponentIds
+        // This will always be true in practice, just appeasing typescript
+        if (siblingIds) {
+          const index = siblingIds.indexOf(id)
+          siblingIds.splice(index, 1, ...childComponentIds)
+        }
 
-      // Root component is not selectable, so in practice this should never happen
-      if (parentComponentId === null) return
+        // Ensure all children are selected as a result of ungrouping
+        newSelectedComponentIds.push(...childComponentIds)
 
-      // Move child components to parent of layout component
-      componentConfigs[id].childComponentIds.forEach((childId) => {
-        componentConfigs[childId].parentComponentId = parentComponentId
-      })
-
-      // Replace the layout component with the layout component's children at the same position in the parent's array of children
-      const index =
-        componentConfigs[parentComponentId].childComponentIds.indexOf(id)
-      componentConfigs[parentComponentId].childComponentIds.splice(
-        index,
-        1,
-        ...componentConfigs[id].childComponentIds
-      )
-
-      // Ensure all children are selected as a result of ungrouping
-      newSelectedComponentIds.push(...componentConfigs[id].childComponentIds)
-
-      delete componentConfigs[id]
+        delete componentConfigs[id]
+      }
     })
 
     // Update all react state
@@ -128,21 +115,18 @@ const Home: NextPage = () => {
     selectedComponentIds.forEach((componentId) => {
       const { parentComponentId } = componentConfigs[componentId]
 
-      // Root component is not selectable, so in practice this should never happen
-      if (parentComponentId === null) return
-
       // If the component has already been deleted, do nothing
       if (componentConfigs[componentId] === undefined) return
 
       // Remove the component from the parent's `childComponentIds`
       componentConfigs[parentComponentId].childComponentIds = componentConfigs[
         parentComponentId
-      ].childComponentIds.filter((id) => id !== componentId)
+      ].childComponentIds?.filter((id) => id !== componentId)
 
       // Find and delete all descendants
       const descendantComponentIds: Array<ComponentId> = []
       const findDescendantComponentIds = (componentId: ComponentId) => {
-        componentConfigs[componentId].childComponentIds.forEach((id) => {
+        componentConfigs[componentId].childComponentIds?.forEach((id) => {
           // Add component to deletion queue
           descendantComponentIds.unshift(id)
           // Find remaining descendant components
