@@ -56,8 +56,8 @@ const predefinedListOptions = {
 }
 
 export const componentConfigDefinitions: {
-  [P1 in keyof ComponentConfig]: {
-    [P2 in keyof ComponentConfig[P1]]: ComponentConfigDefinition
+  [Property1 in keyof ComponentConfig]: {
+    [Property2 in keyof ComponentConfig[Property1]]: ComponentConfigDefinition
   }
 } = {
   layoutFlex: {
@@ -227,9 +227,11 @@ export type ComponentConfig = {
   }
 }
 
-export type SavedComponentConfig = {
-  componentType: keyof ComponentConfig
-  config: ComponentConfig[keyof ComponentConfig]
+export interface SavedComponentConfig<
+  T extends keyof ComponentConfig = keyof ComponentConfig
+> {
+  componentType: T
+  config: ComponentConfig[T]
   childComponentIds?: Array<ComponentId>
   parentComponentId: ComponentId
 }
