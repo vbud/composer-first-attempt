@@ -50,8 +50,10 @@ export const AddComponent = ({
         const newComponentConfig: SavedComponentConfig = {
           componentType,
           config: drawableComponents[componentType].defaultConfig,
-          childComponentIds: [],
           parentComponentId,
+        }
+        if (drawableComponents[componentType].isLayoutComponent) {
+          newComponentConfig.childComponentIds = []
         }
 
         componentConfigs[newComponentId] = newComponentConfig
