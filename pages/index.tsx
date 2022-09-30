@@ -3,7 +3,12 @@ import Head from 'next/head'
 import React, { useState } from 'react'
 import { nanoid } from 'nanoid'
 
-import { ComponentId, SavedComponentConfigs, SavedComponentConfig } from 'types'
+import {
+  ComponentId,
+  SavedComponentConfigs,
+  SavedComponentConfig,
+  rootComponentId,
+} from 'types'
 import { AddComponent } from 'components/AddComponent'
 import { ComponentBrowser } from 'components/ComponentBrowser'
 import { Canvas } from 'components/Canvas'
@@ -112,16 +117,38 @@ const Home: NextPage = () => {
   }
 
   const deleteSelectedComponents = () => {
-    selectedComponentIds.forEach((componentId) => {
+    if (selectedComponentIds.length === 0) return
+
+    let newSelectedComponentId: ComponentId | undefined
+
+    // Delete the components in reverse order
+    selectedComponentIds.reverse().forEach((componentId, i) => {
       const { parentComponentId } = componentConfigs[componentId]
 
       // If the component has already been deleted, do nothing
       if (componentConfigs[componentId] === undefined) return
 
       // Remove the component from the parent's `childComponentIds`
-      componentConfigs[parentComponentId].childComponentIds = componentConfigs[
-        parentComponentId
-      ].childComponentIds?.filter((id) => id !== componentId)
+      const siblingIds = componentConfigs[parentComponentId].childComponentIds
+      // This will always be true in practice, just appeasing typescript
+      if (siblingIds) {
+        const index = siblingIds.indexOf(componentId)
+        siblingIds.splice(index, 1)
+
+        // Decide the next selected component based on the location of the first deleted component
+        if (i === selectedComponentIds.length - 1) {
+          if (siblingIds[index]) {
+            // If there is another component at the same location as the first selected component, select it
+            newSelectedComponentId = siblingIds[index]
+          } else if (siblingIds.length > 0) {
+            // Otherwise, if there are still other components at the same level, select last one
+            newSelectedComponentId = siblingIds[siblingIds.length - 1]
+          } else if (parentComponentId !== rootComponentId) {
+            // Otherwise, select the parent, unless that parent is the root component, in which case do nothing
+            newSelectedComponentId = parentComponentId
+          }
+        }
+      }
 
       // Find and delete all descendants
       const descendantComponentIds: Array<ComponentId> = []
@@ -140,7 +167,9 @@ const Home: NextPage = () => {
     })
 
     // Update all react state
-    setSelectedComponentIds([])
+    setSelectedComponentIds(
+      newSelectedComponentId ? [newSelectedComponentId] : []
+    )
     setAndSaveComponentConfigs(componentConfigs)
   }
 

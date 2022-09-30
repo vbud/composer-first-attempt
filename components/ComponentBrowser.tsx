@@ -43,7 +43,7 @@ export const ComponentBrowser = ({
     const index = parentConfig.childComponentIds.indexOf(startingComponentId)
 
     if (direction === 'up') {
-      if (index === 0 && parentComponentId !== null) {
+      if (index === 0 && parentComponentId !== rootComponentId) {
         // If no previous siblings available, and not at the root level, move to the parent
         selectComponent(parentComponentId)
       } else if (index > 0) {
