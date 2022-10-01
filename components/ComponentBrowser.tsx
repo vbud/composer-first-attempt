@@ -78,7 +78,7 @@ export const ComponentBrowser = ({
         const grandparentId =
           componentConfigs[parentComponentId].parentComponentId
         // Move to the parent's next sibling, unless the parent is the root component, in which case do nothing
-        if (grandparentId !== null) {
+        if (grandparentId !== rootComponentId) {
           const grandparentConfig = componentConfigs[grandparentId]
 
           // All parents of children by definition have children, so just keeping typescript happy here
