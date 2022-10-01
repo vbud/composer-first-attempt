@@ -8,13 +8,13 @@ import styles from 'styles/Canvas.module.css'
 export const Canvas = ({
   componentConfigs,
   selectedComponentIds,
-  setSelectedComponentIds,
+  setSelectedComponents,
   onClickComponent,
   onKeyDown,
 }: {
   componentConfigs: SavedComponentConfigs
   selectedComponentIds: Array<ComponentId>
-  setSelectedComponentIds: (componentIds: Array<ComponentId>) => void
+  setSelectedComponents: (componentIds: Array<ComponentId>) => void
   onClickComponent: (componentId: ComponentId, event: React.MouseEvent) => void
   onKeyDown: (event: React.KeyboardEvent) => void
 }) => {
@@ -56,7 +56,7 @@ export const Canvas = ({
       onKeyDown={onKeyDown}
       onClick={() => {
         // If the click gets here, a component was not clicked because `stopPropagation` is called whenever a component is clicked.
-        setSelectedComponentIds([])
+        setSelectedComponents([])
       }}
     >
       {componentConfigs[rootComponentId] &&

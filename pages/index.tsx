@@ -15,6 +15,11 @@ import { Canvas } from 'components/Canvas'
 import { ComponentConfigEditor } from 'components/ComponentConfigEditor'
 import { drawableComponents } from 'components/libraryComponents'
 import { readComponentConfigs, saveComponentConfigs } from 'utils/localStorage'
+import {
+  queryParamKeys,
+  getQueryParam,
+  changeQueryParam,
+} from 'utils/queryParams'
 
 import styles from 'styles/Home.module.css'
 
@@ -22,9 +27,24 @@ const Home: NextPage = () => {
   const [componentConfigs, setComponentConfigs] =
     useState<SavedComponentConfigs>(readComponentConfigs())
 
-  const [selectedComponentIds, setSelectedComponentIds] = useState<
-    Array<ComponentId>
-  >([])
+  const selectedComponentIdsParam = getQueryParam(
+    queryParamKeys.selectedComponentIds
+  )
+  // Filter out any components without a corresponding saved config
+  const validatedIds = (
+    typeof selectedComponentIdsParam === 'string'
+      ? selectedComponentIdsParam.split(',')
+      : []
+  ).filter((id) => componentConfigs[id])
+
+  const [selectedComponentIds, setSelectedComponentIds] =
+    useState<Array<ComponentId>>(validatedIds)
+
+  const setSelectedComponents = (ids: Array<ComponentId>) => {
+    setSelectedComponentIds(ids)
+
+    changeQueryParam(queryParamKeys.selectedComponentIds, ids.join(','))
+  }
 
   const setAndSaveComponentConfigs = (
     componentConfigs: SavedComponentConfigs
@@ -81,7 +101,7 @@ const Home: NextPage = () => {
 
     // Update all react state
     setAndSaveComponentConfigs(componentConfigs)
-    setSelectedComponentIds([newLayoutComponentId])
+    setSelectedComponents([newLayoutComponentId])
   }
 
   const ungroupSelectedComponents = () => {
@@ -113,7 +133,7 @@ const Home: NextPage = () => {
 
     // Update all react state
     setAndSaveComponentConfigs(componentConfigs)
-    setSelectedComponentIds(newSelectedComponentIds)
+    setSelectedComponents(newSelectedComponentIds)
   }
 
   const deleteSelectedComponents = () => {
@@ -167,10 +187,10 @@ const Home: NextPage = () => {
     })
 
     // Update all react state
-    setSelectedComponentIds(
+    setAndSaveComponentConfigs(componentConfigs)
+    setSelectedComponents(
       newSelectedComponentId ? [newSelectedComponentId] : []
     )
-    setAndSaveComponentConfigs(componentConfigs)
   }
 
   const onClickComponent = (
@@ -180,19 +200,21 @@ const Home: NextPage = () => {
     if (selectedComponentIds.includes(componentId)) return
 
     if (event.metaKey) {
-      setSelectedComponentIds([...selectedComponentIds, componentId])
+      setSelectedComponents([...selectedComponentIds, componentId])
     } else {
-      setSelectedComponentIds([componentId])
+      setSelectedComponents([componentId])
     }
   }
 
   const onKeyDown = (event: React.KeyboardEvent) => {
-    event.preventDefault()
-
     if (event.code === 'Backspace') deleteSelectedComponents()
-    else if (event.code === 'KeyG' && event.metaKey && event.shiftKey)
+    else if (event.code === 'KeyG' && event.metaKey && event.shiftKey) {
+      event.preventDefault()
       ungroupSelectedComponents()
-    else if (event.code === 'KeyG' && event.metaKey) groupSelectedComponents()
+    } else if (event.code === 'KeyG' && event.metaKey) {
+      event.preventDefault()
+      groupSelectedComponents()
+    }
   }
 
   return (
@@ -215,7 +237,7 @@ const Home: NextPage = () => {
       <ComponentBrowser
         componentConfigs={componentConfigs}
         selectedComponentIds={selectedComponentIds}
-        setSelectedComponentIds={setSelectedComponentIds}
+        setSelectedComponents={setSelectedComponents}
         onClickComponent={onClickComponent}
         onKeyDown={onKeyDown}
       />
@@ -223,7 +245,7 @@ const Home: NextPage = () => {
       <Canvas
         componentConfigs={componentConfigs}
         selectedComponentIds={selectedComponentIds}
-        setSelectedComponentIds={setSelectedComponentIds}
+        setSelectedComponents={setSelectedComponents}
         onClickComponent={onClickComponent}
         onKeyDown={onKeyDown}
       />

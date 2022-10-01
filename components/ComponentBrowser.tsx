@@ -8,18 +8,18 @@ import styles from 'styles/ComponentBrowser.module.css'
 export const ComponentBrowser = ({
   componentConfigs,
   selectedComponentIds,
-  setSelectedComponentIds,
+  setSelectedComponents,
   onKeyDown,
   onClickComponent,
 }: {
   componentConfigs: SavedComponentConfigs
   selectedComponentIds: Array<ComponentId>
-  setSelectedComponentIds: (componentIds: Array<ComponentId>) => void
+  setSelectedComponents: (componentIds: Array<ComponentId>) => void
   onClickComponent: (componentId: ComponentId, event: React.MouseEvent) => void
   onKeyDown: (event: React.KeyboardEvent) => void
 }) => {
   const selectComponent = (componentId: ComponentId) => {
-    setSelectedComponentIds([componentId])
+    setSelectedComponents([componentId])
   }
 
   const move = (direction: 'up' | 'down') => {
@@ -132,8 +132,6 @@ export const ComponentBrowser = ({
       // Allows element to be focused, which in turn allows the element to capture key presses
       tabIndex={-1}
       onKeyDown={(event) => {
-        event.preventDefault()
-
         if (event.code === 'ArrowUp') move('up')
         else if (event.code === 'ArrowDown') move('down')
         else onKeyDown(event)

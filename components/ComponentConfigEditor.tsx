@@ -138,6 +138,7 @@ export const ComponentConfigEditor = ({
   } else {
     const componentId = componentIds[0]
     const { config, componentType } = componentConfigs[componentId]
+
     content = Object.keys(config).map((configItemKey) => (
       <ConfigItemEditor
         key={configItemKey}
