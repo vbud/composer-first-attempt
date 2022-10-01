@@ -6,6 +6,7 @@ import {
 } from 'types'
 
 import styles from 'styles/ComponentConfigEditor.module.css'
+import { drawableComponents } from './libraryComponents'
 
 type ConfigItemKey = keyof ComponentConfig[keyof ComponentConfig]
 type ConfigItemValue = ComponentConfig[ConfigItemKey]
@@ -118,16 +119,18 @@ const ConfigItemEditor = ({
   return null
 }
 
+const layoutComponentTypes = ['layoutFlex', 'layoutGrid'] as const
+
 type ComponentEditorProps = {
   componentIds: Array<ComponentId>
   componentConfigs: SavedComponentConfigs
-  onChangeComponentConfigs: (configs: SavedComponentConfigs) => void
+  setAndSaveComponentConfigs: (configs: SavedComponentConfigs) => void
 }
 
 export const ComponentConfigEditor = ({
   componentIds,
   componentConfigs,
-  onChangeComponentConfigs,
+  setAndSaveComponentConfigs,
 }: ComponentEditorProps) => {
   let content: React.ReactNode = null
 
@@ -138,15 +141,16 @@ export const ComponentConfigEditor = ({
   } else {
     const componentId = componentIds[0]
     const { config, componentType } = componentConfigs[componentId]
+    let itemsToRender: Array<React.ReactNode> = []
 
-    content = Object.keys(config).map((configItemKey) => (
+    itemsToRender = Object.keys(config).map((configItemKey) => (
       <ConfigItemEditor
         key={configItemKey}
         componentType={componentType}
         configItemKey={configItemKey}
         configItemValue={config[configItemKey]}
         onChange={(value) => {
-          onChangeComponentConfigs({
+          setAndSaveComponentConfigs({
             ...componentConfigs,
             [componentId]: {
               ...componentConfigs[componentId],
@@ -159,6 +163,31 @@ export const ComponentConfigEditor = ({
         }}
       />
     ))
+
+    if (drawableComponents[componentType].isLayoutComponent) {
+      itemsToRender.unshift(
+        <div key="__layoutType__">
+          <div>type:</div>
+          <select
+            value={componentType}
+            onChange={(event) => {
+              const newComponentType = event.target
+                .value as typeof layoutComponentTypes[number]
+              componentConfigs[componentId].componentType = newComponentType
+              componentConfigs[componentId].config =
+                drawableComponents[newComponentType].defaultConfig
+              setAndSaveComponentConfigs(componentConfigs)
+            }}
+          >
+            {layoutComponentTypes.map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+        </div>
+      )
+    }
+
+    content = itemsToRender
   }
 
   return <div className={styles.root}>{content}</div>

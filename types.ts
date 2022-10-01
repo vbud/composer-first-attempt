@@ -44,6 +44,10 @@ const predefinedListOptions = {
       'space-evenly',
     ] as const,
   },
+  layoutGrid: {
+    alignItems: ['stretch', 'start', 'end', 'center', 'baseline'] as const,
+    justifyItems: ['start', 'end', 'center', 'stretch'] as const,
+  },
   muiAlert: {
     severity: ['success', 'info', 'warning', 'error'] as const,
   },
@@ -72,6 +76,28 @@ export const componentConfigDefinitions: {
     justifyContent: {
       type: 'predefinedList',
       options: predefinedListOptions.layoutFlex.justifyContent,
+    },
+    gap: {
+      type: 'number',
+    },
+  },
+  layoutGrid: {
+    gridTemplateRows: {
+      type: 'string',
+    },
+    gridTemplateColumns: {
+      type: 'string',
+    },
+    gridTemplateAreas: {
+      type: 'string',
+    },
+    alignItems: {
+      type: 'predefinedList',
+      options: predefinedListOptions.layoutGrid.alignItems,
+    },
+    justifyItems: {
+      type: 'predefinedList',
+      options: predefinedListOptions.layoutGrid.justifyItems,
     },
     gap: {
       type: 'number',
@@ -173,6 +199,14 @@ export const componentConfigDefinitions: {
 }
 
 export type ComponentConfig = {
+  layoutGrid: {
+    gridTemplateRows: string
+    gridTemplateColumns: string
+    gridTemplateAreas: string
+    alignItems: typeof predefinedListOptions.layoutGrid.alignItems[number]
+    justifyItems: typeof predefinedListOptions.layoutGrid.justifyItems[number]
+    gap: number
+  }
   layoutFlex: {
     flexDirection: typeof predefinedListOptions.layoutFlex.flexDirection[number]
     alignItems: typeof predefinedListOptions.layoutFlex.alignItems[number]

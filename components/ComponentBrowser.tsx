@@ -99,11 +99,7 @@ export const ComponentBrowser = ({
       const { componentType, childComponentIds } = componentConfigs[componentId]
 
       let children
-      if (
-        drawableComponents[componentType].isLayoutComponent &&
-        Array.isArray(childComponentIds) &&
-        childComponentIds.length > 0
-      ) {
+      if (childComponentIds && childComponentIds.length > 0) {
         children = renderComponents(childComponentIds)
       }
 

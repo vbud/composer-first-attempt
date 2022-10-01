@@ -231,6 +231,7 @@ const Home: NextPage = () => {
           componentConfigs={componentConfigs}
           selectedComponentIds={selectedComponentIds}
           setAndSaveComponentConfigs={setAndSaveComponentConfigs}
+          setSelectedComponents={setSelectedComponents}
         />
       </div>
 
@@ -253,7 +254,7 @@ const Home: NextPage = () => {
       <ComponentConfigEditor
         componentIds={selectedComponentIds}
         componentConfigs={componentConfigs}
-        onChangeComponentConfigs={setAndSaveComponentConfigs}
+        setAndSaveComponentConfigs={setAndSaveComponentConfigs}
       />
     </div>
   )

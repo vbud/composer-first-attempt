@@ -17,12 +17,14 @@ export const AddComponent = ({
   componentConfigs,
   selectedComponentIds,
   setAndSaveComponentConfigs,
+  setSelectedComponents,
 }: {
   componentConfigs: SavedComponentConfigs
   selectedComponentIds: Array<ComponentId>
   setAndSaveComponentConfigs: (
     setComponentConfigs: SavedComponentConfigs
   ) => void
+  setSelectedComponents: (componentIds: Array<ComponentId>) => void
 }) => {
   return (
     <Select
@@ -63,6 +65,7 @@ export const AddComponent = ({
         )
 
         setAndSaveComponentConfigs(componentConfigs)
+        setSelectedComponents([newComponentId])
       }}
     >
       {Object.keys(drawableComponents)

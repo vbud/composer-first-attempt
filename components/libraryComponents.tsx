@@ -47,6 +47,20 @@ export const drawableComponents: {
       <div style={{ display: 'flex', ...config }}>{children}</div>
     ),
   },
+  layoutGrid: {
+    isLayoutComponent: true,
+    defaultConfig: {
+      gridTemplateRows: 'auto',
+      gridTemplateColumns: 'auto',
+      gridTemplateAreas: 'none',
+      alignItems: 'stretch',
+      justifyItems: 'start',
+      gap: 0,
+    },
+    render: (config, children) => (
+      <div style={{ display: 'grid', ...config }}>{children}</div>
+    ),
+  },
   muiAlert: {
     defaultConfig: {
       severity: 'success',
