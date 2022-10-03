@@ -1,9 +1,20 @@
+import * as mui from '@mui/material'
 import classnames from 'classnames'
 
 import { ComponentId, rootComponentId, SavedComponentConfigs } from 'types'
-import { drawableComponents } from 'components/libraryComponents'
+import {
+  primitiveComponents,
+  layoutComponents,
+} from 'components/builtInComponents'
 
 import styles from 'styles/Canvas.module.css'
+import { buildProps } from 'utils/propHelpers'
+
+const allComponents = {
+  ...primitiveComponents,
+  ...layoutComponents,
+  ...mui,
+}
 
 export const Canvas = ({
   componentConfigs,
@@ -20,13 +31,14 @@ export const Canvas = ({
 }) => {
   const renderComponents = (componentIds: Array<ComponentId>) => {
     return componentIds.map((componentId) => {
-      const { componentType, config, childComponentIds } =
+      const { componentType, props, childComponentIds } =
         componentConfigs[componentId]
 
       let children
-      if (childComponentIds && childComponentIds?.length > 0) {
+      if (childComponentIds && childComponentIds.length > 0) {
         children = renderComponents(childComponentIds)
       }
+      const Component = allComponents[componentType]
 
       return (
         <div
@@ -41,7 +53,10 @@ export const Canvas = ({
         >
           {/* Ensure children do not swallow clicks */}
           <div style={{ pointerEvents: 'none' }}>
-            {drawableComponents[componentType].render(config, children)}
+            {/* TODO: is this a problem? */}
+            <Component {...buildProps(componentType, props)}>
+              {children}
+            </Component>
           </div>
         </div>
       )

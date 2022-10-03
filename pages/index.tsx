@@ -12,8 +12,7 @@ import {
 import { AddComponent } from 'components/AddComponent'
 import { ComponentBrowser } from 'components/ComponentBrowser'
 import { Canvas } from 'components/Canvas'
-import { ComponentConfigEditor } from 'components/ComponentConfigEditor'
-import { drawableComponents } from 'components/libraryComponents'
+import { ComponentPropsEditor } from 'components/ComponentPropsEditor'
 import { readComponentConfigs, saveComponentConfigs } from 'utils/localStorage'
 import {
   queryParamKeys,
@@ -22,6 +21,7 @@ import {
 } from 'utils/queryParams'
 
 import styles from 'styles/Home.module.css'
+import { isLayoutComponent } from 'components/builtInComponents'
 
 const Home: NextPage = () => {
   const [componentConfigs, setComponentConfigs] =
@@ -61,10 +61,10 @@ const Home: NextPage = () => {
 
     // Create a new layout component at same level as first child's parent
     const newLayoutComponentId = nanoid()
-    const newLayoutComponentType = 'layoutFlex'
+    const newLayoutComponentType = 'LayoutFlex'
     const newLayoutComponentConfig: SavedComponentConfig = {
       componentType: newLayoutComponentType,
-      config: drawableComponents[newLayoutComponentType].defaultConfig,
+      props: {},
       // Add the selected components to the new layout component
       childComponentIds: [...selectedComponentIds],
       parentComponentId: firstSelectedComponentParentId,
@@ -106,11 +106,14 @@ const Home: NextPage = () => {
 
   const ungroupSelectedComponents = () => {
     const newSelectedComponentIds: Array<ComponentId> = []
+    let foundLayoutComponents = false
 
     selectedComponentIds.forEach((id) => {
       // Only ungroup layout components
-      const { childComponentIds, parentComponentId } = componentConfigs[id]
-      if (childComponentIds) {
+      if (isLayoutComponent(componentConfigs[id].componentType)) {
+        foundLayoutComponents = true
+
+        const { childComponentIds, parentComponentId } = componentConfigs[id]
         // Move child components to parent of layout component
         childComponentIds.forEach((childId) => {
           componentConfigs[childId].parentComponentId = parentComponentId
@@ -131,9 +134,12 @@ const Home: NextPage = () => {
       }
     })
 
-    // Update all react state
-    setAndSaveComponentConfigs(componentConfigs)
-    setSelectedComponents(newSelectedComponentIds)
+    // Only update if any layout components were found to ungroup, otherwise do nothing
+    if (foundLayoutComponents) {
+      // Update all react state
+      setAndSaveComponentConfigs(componentConfigs)
+      setSelectedComponents(newSelectedComponentIds)
+    }
   }
 
   const deleteSelectedComponents = () => {
@@ -251,7 +257,7 @@ const Home: NextPage = () => {
         onKeyDown={onKeyDown}
       />
 
-      <ComponentConfigEditor
+      <ComponentPropsEditor
         componentIds={selectedComponentIds}
         componentConfigs={componentConfigs}
         setAndSaveComponentConfigs={setAndSaveComponentConfigs}

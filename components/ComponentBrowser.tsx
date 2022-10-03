@@ -1,7 +1,6 @@
 import classnames from 'classnames'
 
 import { ComponentId, rootComponentId, SavedComponentConfigs } from 'types'
-import { drawableComponents } from 'components/libraryComponents'
 
 import styles from 'styles/ComponentBrowser.module.css'
 

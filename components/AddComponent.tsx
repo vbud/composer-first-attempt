@@ -1,17 +1,19 @@
 import { nanoid } from 'nanoid'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
+import ListSubheader from '@mui/material/ListSubheader'
 
 import {
   rootComponentId,
-  ComponentConfig,
   ComponentId,
+  ComponentType,
   SavedComponentConfig,
   SavedComponentConfigs,
+  libraryPropTypes,
 } from 'types'
-import { drawableComponents } from 'components/libraryComponents'
 
 import styles from 'styles/AddComponent.module.css'
+import { primitiveComponents } from './builtInComponents'
 
 export const AddComponent = ({
   componentConfigs,
@@ -26,6 +28,12 @@ export const AddComponent = ({
   ) => void
   setSelectedComponents: (componentIds: Array<ComponentId>) => void
 }) => {
+  const renderMenuItem = (componentName: ComponentType) => (
+    <MenuItem value={componentName} key={componentName}>
+      {componentName}
+    </MenuItem>
+  )
+
   return (
     <Select
       className={styles.root}
@@ -40,7 +48,7 @@ export const AddComponent = ({
           }
         }
 
-        const componentType = event.target.value as keyof ComponentConfig
+        const componentType = event.target.value as ComponentType
 
         const parentComponentId =
           selectedComponentIds.length === 1 &&
@@ -51,11 +59,9 @@ export const AddComponent = ({
         const newComponentId = nanoid()
         const newComponentConfig: SavedComponentConfig = {
           componentType,
-          config: drawableComponents[componentType].defaultConfig,
+          props: {},
           parentComponentId,
-        }
-        if (drawableComponents[componentType].isLayoutComponent) {
-          newComponentConfig.childComponentIds = []
+          childComponentIds: [],
         }
 
         componentConfigs[newComponentId] = newComponentConfig
@@ -68,17 +74,10 @@ export const AddComponent = ({
         setSelectedComponents([newComponentId])
       }}
     >
-      {Object.keys(drawableComponents)
-        .filter(
-          (componentName) =>
-            !drawableComponents[componentName as keyof ComponentConfig]
-              .isLayoutComponent
-        )
-        .map((componentName) => (
-          <MenuItem value={componentName} key={componentName}>
-            {componentName}
-          </MenuItem>
-        ))}
+      <ListSubheader>Built-in primitives</ListSubheader>
+      {Object.keys(primitiveComponents).map(renderMenuItem)}
+      <ListSubheader>Material UI</ListSubheader>
+      {Object.keys(libraryPropTypes).map(renderMenuItem)}
     </Select>
   )
 }
