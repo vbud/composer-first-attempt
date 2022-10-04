@@ -47,18 +47,18 @@ export const ComponentBrowser = ({
         // If no previous siblings available, and not at the root level, move to the parent
         selectComponent(parentComponentId)
       } else if (index > 0) {
-        const previousSiblingId = parentConfig.childComponentIds[index - 1]
-        const previousSiblingChildIds =
-          componentConfigs[previousSiblingId].childComponentIds
-        if (previousSiblingChildIds && previousSiblingChildIds.length > 0) {
-          // If previous sibling has children, move to its last child
-          selectComponent(
-            previousSiblingChildIds[previousSiblingChildIds.length - 1]
-          )
-        } else {
-          // Otherwise, move to the previous sibling
-          selectComponent(previousSiblingId)
+        const moveToLastDescendant = (componentId: ComponentId) => {
+          const childIds = componentConfigs[componentId].childComponentIds
+          // If there are children, keep going until the last descendant is found
+          if (childIds && childIds.length > 0) {
+            moveToLastDescendant(childIds[childIds.length - 1])
+          } else {
+            // Otherwise, select the component, as it is the last descendant
+            selectComponent(componentId)
+          }
         }
+        // Move to the last descendant of the previous sibling
+        moveToLastDescendant(parentConfig.childComponentIds[index - 1])
       }
     } else if (direction === 'down') {
       if (
@@ -75,21 +75,32 @@ export const ComponentBrowser = ({
         index === parentConfig.childComponentIds.length - 1 &&
         parentComponentId !== rootComponentId
       ) {
-        const grandparentId =
-          componentConfigs[parentComponentId].parentComponentId
-        // Move to the parent's next sibling, unless the parent is the root component, in which case do nothing
-        if (grandparentId !== rootComponentId) {
-          const grandparentConfig = componentConfigs[grandparentId]
+        const tryMoveToNextSibling = (parentId: ComponentId) => {
+          // Move to the parent's next sibling, unless the parent is the root component, in which case do nothing
+          if (parentId !== rootComponentId) {
+            const grandparentId = componentConfigs[parentId].parentComponentId
+            const grandparentConfig = componentConfigs[grandparentId]
 
-          // All parents of children by definition have children, so just keeping typescript happy here
-          if (grandparentConfig.childComponentIds) {
-            const parentIndex =
-              grandparentConfig.childComponentIds.indexOf(parentComponentId)
-            selectComponent(
-              grandparentConfig.childComponentIds[parentIndex + 1]
-            )
+            // All parents of children by definition have children, so just keeping typescript happy here
+            if (grandparentConfig.childComponentIds) {
+              const parentIndex =
+                grandparentConfig.childComponentIds.indexOf(parentId)
+              if (
+                parentIndex <
+                grandparentConfig.childComponentIds.length - 1
+              ) {
+                // If there are more siblings remaining, move to the next one.
+                selectComponent(
+                  grandparentConfig.childComponentIds[parentIndex + 1]
+                )
+              } else {
+                // Otherwise, try moving to the next sibling of the grandparent
+                tryMoveToNextSibling(grandparentId)
+              }
+            }
           }
         }
+        tryMoveToNextSibling(parentComponentId)
       }
     }
   }
