@@ -142,26 +142,24 @@ const ConfigItemEditor = ({
 
 const layoutComponentTypes = ['LayoutFlex', 'LayoutGrid'] as const
 
-type ComponentEditorProps = {
-  componentIds: Array<ComponentId>
-  componentConfigs: SavedComponentConfigs
-  setAndSaveComponentConfigs: (configs: SavedComponentConfigs) => void
-}
-
 export const ComponentPropsEditor = ({
-  componentIds,
+  selectedComponentIds,
   componentConfigs,
   setAndSaveComponentConfigs,
-}: ComponentEditorProps) => {
+}: {
+  selectedComponentIds: Array<ComponentId>
+  componentConfigs: SavedComponentConfigs
+  setAndSaveComponentConfigs: (configs: SavedComponentConfigs) => void
+}) => {
   let content: React.ReactNode = null
 
-  if (componentIds.length === 0) {
+  if (selectedComponentIds.length === 0) {
     content = 'No component selected.'
-  } else if (componentIds.length > 1) {
+  } else if (selectedComponentIds.length > 1) {
     content = 'Multiple components selected.'
   } else {
-    const componentId = componentIds[0]
-    const { props, componentType } = componentConfigs[componentId]
+    const selectedComponentId = selectedComponentIds[0]
+    const { props, componentType } = componentConfigs[selectedComponentId]
     let itemsToRender: Array<React.ReactNode> = []
 
     itemsToRender = Object.keys(componentPropTypes[componentType]).map(
@@ -169,12 +167,12 @@ export const ComponentPropsEditor = ({
         // Do not show children prop in the editor, as children are set differently
         propKey === 'children' ? null : (
           <ConfigItemEditor
-            key={propKey}
+            key={`${selectedComponentId}-${propKey}`}
             componentType={componentType}
             propKey={propKey}
             propValue={props[propKey]}
             onChange={(value) => {
-              const props = { ...componentConfigs[componentId].props }
+              const props = { ...componentConfigs[selectedComponentId].props }
               if (value === undefined) {
                 delete props[propKey]
               } else {
@@ -182,8 +180,8 @@ export const ComponentPropsEditor = ({
               }
               setAndSaveComponentConfigs({
                 ...componentConfigs,
-                [componentId]: {
-                  ...componentConfigs[componentId],
+                [selectedComponentId]: {
+                  ...componentConfigs[selectedComponentId],
                   props,
                 },
               })
@@ -194,15 +192,16 @@ export const ComponentPropsEditor = ({
 
     if (isLayoutComponent(componentType)) {
       itemsToRender.unshift(
-        <div key="__layoutType__">
+        <div key={`${selectedComponentId}-__layoutType__`}>
           <div>type:</div>
           <select
             value={componentType}
             onChange={(event) => {
               const newComponentType = event.target
                 .value as typeof layoutComponentTypes[number]
-              componentConfigs[componentId].componentType = newComponentType
-              componentConfigs[componentId].props = {}
+              componentConfigs[selectedComponentId].componentType =
+                newComponentType
+              componentConfigs[selectedComponentId].props = {}
               setAndSaveComponentConfigs(componentConfigs)
             }}
           >

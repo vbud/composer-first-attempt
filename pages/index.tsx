@@ -300,7 +300,7 @@ const Home: NextPage = () => {
       />
 
       <ComponentPropsEditor
-        componentIds={selectedComponentIds}
+        selectedComponentIds={selectedComponentIds}
         componentConfigs={componentConfigs}
         setAndSaveComponentConfigs={setAndSaveComponentConfigs}
       />
