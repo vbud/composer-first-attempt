@@ -77,18 +77,15 @@ const Home: NextPage = () => {
     // Replace the first selected component with the new layout component at the same position in the array
     const siblingIds =
       componentConfigs[firstSelectedComponentParentId].childComponentIds
-    // This will always be true in practice, just appeasing typescript
-    if (siblingIds) {
-      siblingIds[siblingIds.indexOf(firstSelectedComponentId)] =
-        newLayoutComponentId
-    }
+    siblingIds[siblingIds.indexOf(firstSelectedComponentId)] =
+      newLayoutComponentId
 
     // Remove the remaining selected components from their parents
     if (remainingSelectedComponentIds.length > 0) {
       remainingSelectedComponentIds.forEach((componentId) => {
         const { parentComponentId } = componentConfigs[componentId]
         componentConfigs[parentComponentId].childComponentIds =
-          componentConfigs[parentComponentId].childComponentIds?.filter(
+          componentConfigs[parentComponentId].childComponentIds.filter(
             (id) => id !== componentId
           )
       })
@@ -121,11 +118,8 @@ const Home: NextPage = () => {
 
         // Replace the layout component with the layout component's children at the same position in the parent's array of children
         const siblingIds = componentConfigs[parentComponentId].childComponentIds
-        // This will always be true in practice, just appeasing typescript
-        if (siblingIds) {
-          const index = siblingIds.indexOf(id)
-          siblingIds.splice(index, 1, ...childComponentIds)
-        }
+        const index = siblingIds.indexOf(id)
+        siblingIds.splice(index, 1, ...childComponentIds)
 
         // Ensure all children are selected as a result of ungrouping
         newSelectedComponentIds.push(...childComponentIds)
@@ -156,30 +150,27 @@ const Home: NextPage = () => {
 
       // Remove the component from the parent's `childComponentIds`
       const siblingIds = componentConfigs[parentComponentId].childComponentIds
-      // This will always be true in practice, just appeasing typescript
-      if (siblingIds) {
-        const index = siblingIds.indexOf(componentId)
-        siblingIds.splice(index, 1)
+      const index = siblingIds.indexOf(componentId)
+      siblingIds.splice(index, 1)
 
-        // Decide the next selected component based on the location of the first deleted component
-        if (i === selectedComponentIds.length - 1) {
-          if (siblingIds[index]) {
-            // If there is another component at the same location as the first selected component, select it
-            newSelectedComponentId = siblingIds[index]
-          } else if (siblingIds.length > 0) {
-            // Otherwise, if there are still other components at the same level, select last one
-            newSelectedComponentId = siblingIds[siblingIds.length - 1]
-          } else if (parentComponentId !== rootComponentId) {
-            // Otherwise, select the parent, unless that parent is the root component, in which case do nothing
-            newSelectedComponentId = parentComponentId
-          }
+      // Decide the next selected component based on the location of the first deleted component
+      if (i === selectedComponentIds.length - 1) {
+        if (siblingIds[index]) {
+          // If there is another component at the same location as the first selected component, select it
+          newSelectedComponentId = siblingIds[index]
+        } else if (siblingIds.length > 0) {
+          // Otherwise, if there are still other components at the same level, select last one
+          newSelectedComponentId = siblingIds[siblingIds.length - 1]
+        } else if (parentComponentId !== rootComponentId) {
+          // Otherwise, select the parent, unless that parent is the root component, in which case do nothing
+          newSelectedComponentId = parentComponentId
         }
       }
 
       // Find and delete all descendants
       const descendantComponentIds: Array<ComponentId> = []
       const findDescendantComponentIds = (componentId: ComponentId) => {
-        componentConfigs[componentId].childComponentIds?.forEach((id) => {
+        componentConfigs[componentId].childComponentIds.forEach((id) => {
           // Add component to deletion queue
           descendantComponentIds.unshift(id)
           // Find remaining descendant components

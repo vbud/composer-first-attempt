@@ -10,6 +10,7 @@ import {
   SavedComponentConfig,
   SavedComponentConfigs,
   libraryPropTypes,
+  componentPropTypes,
 } from 'types'
 
 import styles from 'styles/AddComponent.module.css'
@@ -50,13 +51,37 @@ export const AddComponent = ({
 
         const componentType = event.target.value as ComponentType
 
-        const parentComponentId =
-          selectedComponentIds.length === 1 &&
-          componentConfigs[selectedComponentIds[0]].childComponentIds
-            ? selectedComponentIds[0]
-            : rootComponentId
-
         const newComponentId = nanoid()
+
+        let parentComponentId: ComponentId
+        if (selectedComponentIds.length === 1) {
+          const selectedId = selectedComponentIds[0]
+          // If there is exactly 1 component selected
+          const firstSelectedComponentConfig = componentConfigs[selectedId]
+          if (
+            componentPropTypes[
+              componentConfigs[selectedId].componentType
+            ].hasOwnProperty('children')
+          ) {
+            // If the component allows children, make the new component a child
+            parentComponentId = selectedId
+            firstSelectedComponentConfig.childComponentIds.push(newComponentId)
+          } else {
+            // Otherwise, make the new component the next sibling of the selected component
+            parentComponentId = componentConfigs[selectedId].parentComponentId
+            const siblingIds =
+              componentConfigs[parentComponentId].childComponentIds
+            const selectedIdIndex = siblingIds.indexOf(selectedId)
+            siblingIds.splice(selectedIdIndex + 1, 0, newComponentId)
+          }
+        } else {
+          // If 0 or more than 1 components are selected, add the new component at the top level
+          parentComponentId = rootComponentId
+          componentConfigs[rootComponentId].childComponentIds.push(
+            newComponentId
+          )
+        }
+
         const newComponentConfig: SavedComponentConfig = {
           componentType,
           props: {},
@@ -65,10 +90,6 @@ export const AddComponent = ({
         }
 
         componentConfigs[newComponentId] = newComponentConfig
-
-        componentConfigs[parentComponentId].childComponentIds?.push(
-          newComponentId
-        )
 
         setAndSaveComponentConfigs(componentConfigs)
         setSelectedComponents([newComponentId])

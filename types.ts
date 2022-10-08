@@ -23,7 +23,7 @@ export type ComponentProps = Record<string, ComponentPropValue>
 export interface SavedComponentConfig {
   componentType: ComponentType
   props: ComponentProps
-  childComponentIds?: Array<ComponentId>
+  childComponentIds: Array<ComponentId>
   parentComponentId: ComponentId
 }
 

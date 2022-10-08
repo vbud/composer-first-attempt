@@ -34,10 +34,6 @@ export const Canvas = ({
       const { componentType, props, childComponentIds } =
         componentConfigs[componentId]
 
-      let children
-      if (childComponentIds && childComponentIds.length > 0) {
-        children = renderComponents(childComponentIds)
-      }
       const Component = allComponents[componentType]
 
       return (
@@ -55,7 +51,7 @@ export const Canvas = ({
           <div style={{ pointerEvents: 'none' }}>
             {/* TODO: is this a problem? */}
             <Component {...buildProps(componentType, props)}>
-              {children}
+              {renderComponents(childComponentIds)}
             </Component>
           </div>
         </div>

@@ -45,6 +45,10 @@ export const layoutComponentPropTypes = {
       isRequired: false,
       type: 'number',
     },
+    children: {
+      isRequired: false,
+      type: 'node',
+    },
   },
   LayoutGrid: {
     gridTemplateRows: {
@@ -73,6 +77,10 @@ export const layoutComponentPropTypes = {
     gap: {
       isRequired: false,
       type: 'number',
+    },
+    children: {
+      isRequired: false,
+      type: 'node',
     },
   },
 } as const
