@@ -4,7 +4,7 @@
   height: 100vh;
   grid-template-areas:
     'header header header'
-    'componentBrowser canvas componentConfigEditor';
+    'ComponentExplorer canvas componentConfigEditor';
   grid-template-columns: 180px auto 240px;
   grid-template-rows: 50px auto;
 }

@@ -13,7 +13,7 @@ import {
   componentPropTypes,
 } from 'types'
 import { AddComponent } from 'components/AddComponent'
-import { ComponentBrowser } from 'components/ComponentBrowser'
+import { ComponentExplorer } from 'components/ComponentExplorer'
 import { Canvas } from 'components/Canvas'
 import { ComponentPropsEditor } from 'components/ComponentPropsEditor'
 import { isLayoutComponent } from 'components/builtInComponents'
@@ -58,7 +58,7 @@ const Home: NextPage = () => {
   }
 
   const canvasRef = React.createRef<HTMLDivElement>()
-  const componentBrowserRef = React.createRef<HTMLDivElement>()
+  const ComponentExplorerRef = React.createRef<HTMLDivElement>()
 
   const addComponent = (componentType: ComponentType) => {
     // Initialize root component if it does not exist
@@ -295,7 +295,7 @@ const Home: NextPage = () => {
           canvasRef.current && canvasRef.current.focus()
         } else if (event.code === 'KeyE' && event.metaKey && event.shiftKey) {
           event.preventDefault()
-          componentBrowserRef.current && componentBrowserRef.current.focus()
+          ComponentExplorerRef.current && ComponentExplorerRef.current.focus()
         }
       }}
       className={styles.root}
@@ -311,8 +311,8 @@ const Home: NextPage = () => {
         <AddComponent addComponent={addComponent} />
       </div>
 
-      <ComponentBrowser
-        ref={componentBrowserRef}
+      <ComponentExplorer
+        ref={ComponentExplorerRef}
         componentConfigs={componentConfigs}
         selectedComponentIds={selectedComponentIds}
         setSelectedComponents={setSelectedComponents}

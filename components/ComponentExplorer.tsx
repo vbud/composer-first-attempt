@@ -3,18 +3,18 @@ import classnames from 'classnames'
 
 import { ComponentId, rootComponentId, SavedComponentConfigs } from 'types'
 
-import styles from 'styles/ComponentBrowser.module.css'
+import styles from 'styles/ComponentExplorer.module.css'
 
-type ComponentBrowserProps = {
+type ComponentExplorerProps = {
   componentConfigs: SavedComponentConfigs
   selectedComponentIds: Array<ComponentId>
   setSelectedComponents: (componentIds: Array<ComponentId>) => void
   onClickComponent: (componentId: ComponentId, event: React.MouseEvent) => void
   onKeyDown: (event: React.KeyboardEvent) => void
 }
-export const ComponentBrowser = React.forwardRef<
+export const ComponentExplorer = React.forwardRef<
   HTMLDivElement,
-  ComponentBrowserProps
+  ComponentExplorerProps
 >(
   (
     {
@@ -152,4 +152,4 @@ export const ComponentBrowser = React.forwardRef<
     )
   }
 )
-ComponentBrowser.displayName = 'ComponentBrowser'
+ComponentExplorer.displayName = 'ComponentExplorer'
