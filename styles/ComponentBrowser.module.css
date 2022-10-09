@@ -3,7 +3,9 @@
   border-right: 1px solid lightgray;
   padding: 1rem;
   padding-left: 0;
-  outline: none;
+}
+.root:focus {
+  outline: 4px solid lightcyan;
 }
 
 .componentWrapper {

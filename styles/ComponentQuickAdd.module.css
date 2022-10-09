@@ -1,0 +1,17 @@
+.root {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  max-height: 50%;
+  overflow: scroll;
+}
+
+.search {
+  width: 100%;
+}
+
+.selected {
+  background: lightgrey;
+}

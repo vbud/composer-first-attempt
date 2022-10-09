@@ -14,6 +14,7 @@ specifiers:
   eslint: 8.19.0
   eslint-config-next: 12.3.1
   eslint-config-prettier: 8.5.0
+  fuse.js: 6.6.2
   nanoid: 4.0.0
   next: 12.3.1
   nodemon: 2.0.20
@@ -29,6 +30,7 @@ dependencies:
   '@mui/icons-material': 5.10.6_laq6byvcoywmfvx4n22acyaflm
   '@mui/material': 5.10.6_qh4q22gogckwevp57qqkv5tsle
   classnames: 2.3.2
+  fuse.js: 6.6.2
   nanoid: 4.0.0
   next: 12.3.1_2f3qgkpmmpou2hyqrmueifddme
   query-string: 7.1.1
@@ -1701,6 +1703,11 @@ packages:
   /functions-have-names/1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
     dev: true
+
+  /fuse.js/6.6.2:
+    resolution: {integrity: sha512-cJaJkxCCxC8qIIcPBF9yGxY0W/tVZS3uEISDxhYIdtk8OL93pe+6Zj7LjCqVV4dzbqcriOZ+kQ/NE4RXZHsIGA==}
+    engines: {node: '>=10'}
+    dev: false
 
   /gensync/1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}

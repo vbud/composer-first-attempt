@@ -2,6 +2,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import React, { useState } from 'react'
 import { nanoid } from 'nanoid'
+import { Modal } from '@mui/material'
 
 import {
   ComponentId,
@@ -15,6 +16,8 @@ import { AddComponent } from 'components/AddComponent'
 import { ComponentBrowser } from 'components/ComponentBrowser'
 import { Canvas } from 'components/Canvas'
 import { ComponentPropsEditor } from 'components/ComponentPropsEditor'
+import { isLayoutComponent } from 'components/builtInComponents'
+import { ComponentQuickAdd } from 'components/ComponentQuickAdd'
 import { readComponentConfigs, saveComponentConfigs } from 'utils/localStorage'
 import {
   queryParamKeys,
@@ -23,7 +26,6 @@ import {
 } from 'utils/queryParams'
 
 import styles from 'styles/Home.module.css'
-import { isLayoutComponent } from 'components/builtInComponents'
 
 const Home: NextPage = () => {
   const [componentConfigs, setComponentConfigs] =
@@ -56,6 +58,7 @@ const Home: NextPage = () => {
   }
 
   const canvasRef = React.createRef<HTMLDivElement>()
+  const componentBrowserRef = React.createRef<HTMLDivElement>()
 
   const addComponent = (componentType: ComponentType) => {
     // Initialize root component if it does not exist
@@ -258,7 +261,7 @@ const Home: NextPage = () => {
     }
   }
 
-  const onKeyDown = (event: React.KeyboardEvent) => {
+  const handleKeyDownInBrowserOrCanvas = (event: React.KeyboardEvent) => {
     if (event.code === 'Backspace') deleteSelectedComponents()
     else if (event.code === 'KeyG' && event.metaKey && event.shiftKey) {
       event.preventDefault()
@@ -269,8 +272,34 @@ const Home: NextPage = () => {
     }
   }
 
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+
+  const handleClose = () => setIsModalOpen(false)
+
+  const handleAdd = (componentType: ComponentType) => {
+    addComponent(componentType)
+    handleClose()
+    canvasRef.current && canvasRef.current.focus()
+  }
+
   return (
-    <div className={styles.root}>
+    <div
+      // Allows element to be focused, which in turn allows the element to capture key presses
+      tabIndex={-1}
+      onKeyDown={(event: React.KeyboardEvent) => {
+        if (event.code === 'KeyP' && event.metaKey) {
+          event.preventDefault()
+          setIsModalOpen(true)
+        } else if (event.code === 'KeyC' && event.metaKey && event.shiftKey) {
+          event.preventDefault()
+          canvasRef.current && canvasRef.current.focus()
+        } else if (event.code === 'KeyE' && event.metaKey && event.shiftKey) {
+          event.preventDefault()
+          componentBrowserRef.current && componentBrowserRef.current.focus()
+        }
+      }}
+      className={styles.root}
+    >
       <Head>
         <title>composition</title>
         <meta name="description" content="Design with your design system" />
@@ -283,11 +312,12 @@ const Home: NextPage = () => {
       </div>
 
       <ComponentBrowser
+        ref={componentBrowserRef}
         componentConfigs={componentConfigs}
         selectedComponentIds={selectedComponentIds}
         setSelectedComponents={setSelectedComponents}
         onClickComponent={onClickComponent}
-        onKeyDown={onKeyDown}
+        onKeyDown={handleKeyDownInBrowserOrCanvas}
       />
 
       <Canvas
@@ -296,7 +326,7 @@ const Home: NextPage = () => {
         selectedComponentIds={selectedComponentIds}
         setSelectedComponents={setSelectedComponents}
         onClickComponent={onClickComponent}
-        onKeyDown={onKeyDown}
+        onKeyDown={handleKeyDownInBrowserOrCanvas}
       />
 
       <ComponentPropsEditor
@@ -304,6 +334,17 @@ const Home: NextPage = () => {
         componentConfigs={componentConfigs}
         setAndSaveComponentConfigs={setAndSaveComponentConfigs}
       />
+
+      <Modal
+        componentsProps={{ backdrop: { invisible: true } }}
+        open={isModalOpen}
+        onClose={handleClose}
+      >
+        {/* Using a fragment here to work around material-ui ref issue. See https://mui.com/material-ui/guides/composition/#caveat-with-refs */}
+        <>
+          <ComponentQuickAdd onAdd={handleAdd} />
+        </>
+      </Modal>
     </div>
   )
 }

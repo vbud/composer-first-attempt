@@ -1,7 +1,7 @@
 import { ComponentType, libraryPropTypes } from 'types'
+import { primitiveComponentPropTypes } from './builtInComponents'
 
 import styles from 'styles/AddComponent.module.css'
-import { primitiveComponents } from './builtInComponents'
 
 export const AddComponent = ({
   addComponent,
@@ -26,7 +26,7 @@ export const AddComponent = ({
     >
       <option value={buttonText}>{buttonText}</option>
       <optgroup label="Built-in primitives">
-        {Object.keys(primitiveComponents).map(renderOption)}
+        {Object.keys(primitiveComponentPropTypes).map(renderOption)}
       </optgroup>
       <optgroup label="Material UI">
         {Object.keys(libraryPropTypes).map(renderOption)}
