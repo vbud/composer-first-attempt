@@ -8,7 +8,7 @@ import {
 import { isLayoutComponent } from 'components/builtInComponents'
 
 import styles from 'styles/ComponentPropsEditor.module.css'
-import { getPropValue } from 'utils/propHelpers'
+import { buildProps } from 'utils/propHelpers'
 
 type ConfigItemEditorProps = {
   componentType: ComponentType
@@ -25,7 +25,6 @@ const ConfigItemEditor = ({
 }: ConfigItemEditorProps) => {
   const { type: propType, isRequired } =
     componentPropTypes[componentType][propKey]
-  propValue = getPropValue(componentType, propKey, propValue)
   const noValue = '-'
 
   if (propType === 'bool') {
@@ -162,7 +161,7 @@ export const ComponentPropsEditor = ({
     const { props, componentType } = componentConfigs[selectedComponentId]
     let itemsToRender: Array<React.ReactNode> = []
 
-    itemsToRender = Object.keys(componentPropTypes[componentType]).map(
+    itemsToRender = Object.keys(buildProps(componentType, props)).map(
       (propKey) =>
         // Do not show children prop in the editor, as children are set differently
         propKey === 'children' ? null : (

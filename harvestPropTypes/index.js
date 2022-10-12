@@ -4,9 +4,7 @@ const { parse } = require('acorn')
 const { fullAncestor } = require('acorn-walk')
 
 const muiFilePath = require.resolve('@mui/material')
-
 const muiDir = muiFilePath.substring(0, muiFilePath.lastIndexOf('/'))
-const files = fs.readdirSync(muiDir)
 
 // Save primitive propTypes that will be editable in the config editor
 const addPrimitivesIfSimplePropType = (propTypes, node, keyName) => {
@@ -104,19 +102,45 @@ const parseComponentFile = (componentPath) => {
   })
   return propTypes
 }
-
+// Add any proptypes that are not specified in the code
+// E.g. material-ui does not always explicitly define proptypes for props that are applied as-is to native DOM elements
+const unspecifiedPropTypes = {
+  Select: {
+    value: {
+      isRequired: false,
+      type: 'string',
+    },
+  },
+  MenuItem: {
+    value: {
+      isRequired: false,
+      type: 'string',
+    },
+  },
+}
+const addUnspecifiedPropTypes = (components, componentType) => {
+  if (unspecifiedPropTypes[componentType]) {
+    components[componentType] = {
+      ...components[componentType],
+      ...unspecifiedPropTypes[componentType],
+    }
+  }
+}
 const harvestPropTypes = () => {
   const components = {}
 
-  files.forEach((file) => {
-    // Only parse files that begin with an uppercase letter. We assume that means the file exports a React component.
-    // This approach will need to change when we start importing files from other libraries.
-    if (file[0].toLocaleUpperCase() === file[0]) {
-      const componentPath = `${muiDir}/${file}/${file}.js`
+  const componentTypes = fs.readdirSync(muiDir)
+  componentTypes.forEach((componentType) => {
+    // Only parse directories that begin with an uppercase letter. We assume that means the file exports a React component.
+    // We assume the directory name represents the componentType (e.g. Select).
+    // NOTE: These assumptions only apply to material-ui, we will need to abstract the approach once we start pulling in other libraries.
+    if (componentType[0].toLocaleUpperCase() === componentType[0]) {
+      const componentPath = `${muiDir}/${componentType}/${componentType}.js`
       if (fs.existsSync(componentPath)) {
         const defaultExport = require(componentPath).default
         if (reactIs.isValidElementType(defaultExport)) {
-          components[file] = parseComponentFile(componentPath)
+          components[componentType] = parseComponentFile(componentPath)
+          addUnspecifiedPropTypes(components, componentType)
         }
       }
     }

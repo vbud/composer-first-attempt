@@ -6,7 +6,7 @@ import {
 } from 'types'
 
 // Provides a value for required props when no explicit value has been saved.
-export const getPropValue = (
+const getPropValue = (
   componentType: ComponentType,
   propKey: string,
   propValue: ComponentPropValue
@@ -42,7 +42,7 @@ export const getPropValue = (
   return propValue
 }
 
-// Fills out component props with values if not all props have saved values.
+// Fills out component props with values, even if some props lack saved values.
 export const buildProps = (
   componentType: ComponentType,
   props: ComponentProps

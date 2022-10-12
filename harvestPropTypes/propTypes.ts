@@ -2545,6 +2545,10 @@ const propTypes = {
     "tabIndex": {
       "isRequired": false,
       "type": "number"
+    },
+    "value": {
+      "isRequired": false,
+      "type": "string"
     }
   },
   "MenuList": {
@@ -3185,10 +3189,7 @@ const propTypes = {
     },
     "value": {
       "isRequired": false,
-      "type": "oneOf",
-      "values": [
-        ""
-      ]
+      "type": "string"
     },
     "variant": {
       "isRequired": false,
