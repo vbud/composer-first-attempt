@@ -57,8 +57,9 @@ const Home: NextPage = () => {
     saveComponentConfigs(componentConfigs)
   }
 
+  const explorerRef = React.createRef<HTMLDivElement>()
   const canvasRef = React.createRef<HTMLDivElement>()
-  const ComponentExplorerRef = React.createRef<HTMLDivElement>()
+  const editorRef = React.createRef<HTMLDivElement>()
 
   const addComponent = (componentType: ComponentType) => {
     const newComponentId = createComponent(
@@ -230,6 +231,8 @@ const Home: NextPage = () => {
     } else if (event.code === 'KeyG' && event.metaKey) {
       event.preventDefault()
       groupSelectedComponents()
+    } else if (event.code === 'Enter') {
+      editorRef.current && editorRef.current.focus()
     }
   }
 
@@ -256,7 +259,7 @@ const Home: NextPage = () => {
           canvasRef.current && canvasRef.current.focus()
         } else if (event.code === 'KeyE' && event.metaKey && event.shiftKey) {
           event.preventDefault()
-          ComponentExplorerRef.current && ComponentExplorerRef.current.focus()
+          explorerRef.current && explorerRef.current.focus()
         }
       }}
       className={styles.root}
@@ -273,7 +276,7 @@ const Home: NextPage = () => {
       </div>
 
       <ComponentExplorer
-        ref={ComponentExplorerRef}
+        ref={explorerRef}
         componentConfigs={componentConfigs}
         selectedComponentIds={selectedComponentIds}
         setSelectedComponents={setSelectedComponents}
@@ -291,6 +294,7 @@ const Home: NextPage = () => {
       />
 
       <ComponentPropsEditor
+        ref={editorRef}
         selectedComponentIds={selectedComponentIds}
         componentConfigs={componentConfigs}
         setAndSaveComponentConfigs={setAndSaveComponentConfigs}

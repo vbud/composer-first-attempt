@@ -6,6 +6,9 @@
   flex-direction: column;
   gap: 0.5rem;
 }
+.root:focus {
+  outline: 4px solid lightcyan;
+}
 
 .customListItem {
   display: flex;

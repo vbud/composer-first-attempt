@@ -1,3 +1,4 @@
+import React from 'react'
 import {
   ComponentId,
   ComponentType,
@@ -141,79 +142,94 @@ const ConfigItemEditor = ({
 
 const layoutComponentTypes = ['LayoutFlex', 'LayoutGrid'] as const
 
-export const ComponentPropsEditor = ({
-  selectedComponentIds,
-  componentConfigs,
-  setAndSaveComponentConfigs,
-}: {
+type ComponentPropsEditorProps = {
   selectedComponentIds: Array<ComponentId>
   componentConfigs: SavedComponentConfigs
   setAndSaveComponentConfigs: (configs: SavedComponentConfigs) => void
-}) => {
-  let content: React.ReactNode = null
+}
+export const ComponentPropsEditor = React.forwardRef<
+  HTMLDivElement,
+  ComponentPropsEditorProps
+>(
+  (
+    { selectedComponentIds, componentConfigs, setAndSaveComponentConfigs },
+    ref
+  ) => {
+    let content: React.ReactNode = null
 
-  if (selectedComponentIds.length === 0) {
-    content = 'No component selected.'
-  } else if (selectedComponentIds.length > 1) {
-    content = 'Multiple components selected.'
-  } else {
-    const selectedComponentId = selectedComponentIds[0]
-    const { props, componentType } = componentConfigs[selectedComponentId]
-    let itemsToRender: Array<React.ReactNode> = []
+    if (selectedComponentIds.length === 0) {
+      content = 'No component selected.'
+    } else if (selectedComponentIds.length > 1) {
+      content = 'Multiple components selected.'
+    } else {
+      const selectedComponentId = selectedComponentIds[0]
+      const { props, componentType } = componentConfigs[selectedComponentId]
+      let itemsToRender: Array<React.ReactNode> = []
 
-    itemsToRender = Object.keys(buildProps(componentType, props)).map(
-      (propKey) =>
-        // Do not show children prop in the editor, as children are set differently
-        propKey === 'children' ? null : (
-          <ConfigItemEditor
-            key={`${selectedComponentId}-${propKey}`}
-            componentType={componentType}
-            propKey={propKey}
-            propValue={props[propKey]}
-            onChange={(value) => {
-              const props = { ...componentConfigs[selectedComponentId].props }
-              if (value === undefined) {
-                delete props[propKey]
-              } else {
-                props[propKey] = value
-              }
-              setAndSaveComponentConfigs({
-                ...componentConfigs,
-                [selectedComponentId]: {
-                  ...componentConfigs[selectedComponentId],
-                  props,
-                },
-              })
-            }}
-          />
-        )
-    )
-
-    if (isLayoutComponent(componentType)) {
-      itemsToRender.unshift(
-        <div key={`${selectedComponentId}-__layoutType__`}>
-          <div>type:</div>
-          <select
-            value={componentType}
-            onChange={(event) => {
-              const newComponentType = event.target
-                .value as typeof layoutComponentTypes[number]
-              componentConfigs[selectedComponentId].componentType =
-                newComponentType
-              componentConfigs[selectedComponentId].props = {}
-              setAndSaveComponentConfigs(componentConfigs)
-            }}
-          >
-            {layoutComponentTypes.map((option) => (
-              <option key={option}>{option}</option>
-            ))}
-          </select>
-        </div>
+      itemsToRender = Object.keys(buildProps(componentType, props)).map(
+        (propKey) =>
+          // Do not show children prop in the editor, as children are set differently
+          propKey === 'children' ? null : (
+            <ConfigItemEditor
+              key={`${selectedComponentId}-${propKey}`}
+              componentType={componentType}
+              propKey={propKey}
+              propValue={props[propKey]}
+              onChange={(value) => {
+                const props = { ...componentConfigs[selectedComponentId].props }
+                if (value === undefined) {
+                  delete props[propKey]
+                } else {
+                  props[propKey] = value
+                }
+                setAndSaveComponentConfigs({
+                  ...componentConfigs,
+                  [selectedComponentId]: {
+                    ...componentConfigs[selectedComponentId],
+                    props,
+                  },
+                })
+              }}
+            />
+          )
       )
+
+      if (isLayoutComponent(componentType)) {
+        itemsToRender.unshift(
+          <div key={`${selectedComponentId}-__layoutType__`}>
+            <div>type:</div>
+            <select
+              value={componentType}
+              onChange={(event) => {
+                const newComponentType = event.target
+                  .value as typeof layoutComponentTypes[number]
+                componentConfigs[selectedComponentId].componentType =
+                  newComponentType
+                componentConfigs[selectedComponentId].props = {}
+                setAndSaveComponentConfigs(componentConfigs)
+              }}
+            >
+              {layoutComponentTypes.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
+            </select>
+          </div>
+        )
+      }
+
+      content = itemsToRender
     }
 
-    content = itemsToRender
+    return (
+      <div
+        ref={ref}
+        // Allows element to be focused, which in turn allows the element to capture key presses
+        tabIndex={-1}
+        className={styles.root}
+      >
+        {content}
+      </div>
+    )
   }
-
-  return <div className={styles.root}>{content}</div>
-}
+)
+ComponentPropsEditor.displayName = 'ComponentPropsEditor'
