@@ -41,7 +41,7 @@ export const Canvas = React.forwardRef<HTMLDivElement, CanvasProps>(
         const { componentType, props, childComponentIds } =
           componentConfigs[componentId]
 
-        const Component = allComponents[componentType]
+        const Component = allComponents[componentType] as React.ElementType
 
         return (
           <div
