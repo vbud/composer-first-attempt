@@ -1,5 +1,5 @@
 {
-  "name": "composition",
+  "name": "composer",
   "private": true,
   "scripts": {
     "dev": "next dev",

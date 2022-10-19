@@ -265,13 +265,13 @@ const Home: NextPage = () => {
       className={styles.root}
     >
       <Head>
-        <title>composition</title>
+        <title>composer</title>
         <meta name="description" content="Design with your design system" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <div className={styles.header}>
-        composition
+        composer
         <AddComponent addComponent={addComponent} />
       </div>
 
