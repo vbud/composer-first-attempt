@@ -2,59 +2,12 @@ import { nanoid } from 'nanoid'
 
 import {
   ComponentId,
-  ComponentProps,
   componentPropTypes,
   ComponentType,
   rootComponentId,
   SavedComponentConfigs,
 } from 'types'
-
-type ComponentTemplate = {
-  componentType: ComponentType
-  props?: ComponentProps
-  children?: Array<ComponentTemplate>
-}
-
-const componentTemplates: Partial<Record<ComponentType, ComponentTemplate>> = {
-  Select: {
-    componentType: 'FormControl',
-    children: [
-      {
-        componentType: 'InputLabel',
-        children: [{ componentType: 'Text', props: { value: 'Item' } }],
-      },
-      {
-        componentType: 'Select',
-        props: {
-          value: 'Item 1',
-        },
-        children: [
-          {
-            componentType: 'MenuItem',
-            props: {
-              value: 'Item 1',
-            },
-            children: [{ componentType: 'Text', props: { value: 'Item 1' } }],
-          },
-          {
-            componentType: 'MenuItem',
-            props: {
-              value: 'Item 2',
-            },
-            children: [{ componentType: 'Text', props: { value: 'Item 2' } }],
-          },
-          {
-            componentType: 'MenuItem',
-            props: {
-              value: 'Item 3',
-            },
-            children: [{ componentType: 'Text', props: { value: 'Item 3' } }],
-          },
-        ],
-      },
-    ],
-  },
-}
+import { ComponentTemplate, componentTemplates } from './componentTemplates'
 
 const hydrateComponent = (
   componentTemplate: ComponentTemplate,
