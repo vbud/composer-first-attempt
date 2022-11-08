@@ -50,19 +50,23 @@ export const ComponentQuickAdd = ({
           }
         }}
       />
-      {searchValue.length > 0
-        ? matchingComponentTypes.map(({ item }, i) => (
+      {searchValue.length > 0 ? (
+        <div className={styles.results}>
+          {matchingComponentTypes.map(({ item }, i) => (
             <div
               key={item}
-              className={classnames({ [styles.selected]: selectedIndex === i })}
+              className={classnames(styles.result, {
+                [styles.selectedResult]: selectedIndex === i,
+              })}
               onClick={() => {
                 onAdd(item)
               }}
             >
               {item}
             </div>
-          ))
-        : null}
+          ))}
+        </div>
+      ) : null}
     </div>
   )
 }

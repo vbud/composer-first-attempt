@@ -44,25 +44,21 @@ export const Canvas = React.forwardRef<HTMLDivElement, CanvasProps>(
         const Component = allComponents[componentType] as React.ElementType
 
         return (
-          <div
+          <Component
+            {...buildProps(componentType, props)}
             key={componentId}
             className={classnames({
               [styles.selected]: selectedComponentIds.includes(componentId),
             })}
-            onClick={(event) => {
+            onClick={(event: React.MouseEvent) => {
               event.stopPropagation()
               onClickComponent(componentId, event)
             }}
           >
-            {/* Ensure children do not swallow clicks */}
-            <div style={{ pointerEvents: 'none' }}>
-              <Component {...buildProps(componentType, props)}>
-                {childComponentIds.length > 0
-                  ? renderComponents(childComponentIds)
-                  : undefined}
-              </Component>
-            </div>
-          </div>
+            {childComponentIds.length > 0
+              ? renderComponents(childComponentIds)
+              : undefined}
+          </Component>
         )
       })
     }

@@ -9,8 +9,15 @@ export const primitiveComponentPropTypes = {
   },
 } as const
 
-const Text = ({ value }: { value: string }) => {
-  return value
+const Text = ({
+  value,
+  ...props
+}: {
+  value: string
+  className?: string
+  onClick?: (event: React.MouseEvent) => void
+}) => {
+  return <span {...props}>{value}</span>
 }
 
 export const primitiveComponents = {
@@ -90,10 +97,15 @@ const LayoutFlex = (props: {
   alignItems: typeof layoutComponentPropTypes.LayoutFlex.alignItems.values[number]
   justifyContent: typeof layoutComponentPropTypes.LayoutFlex.justifyContent.values[number]
   gap: number
+  className?: string
   children?: React.ReactNode
 }) => {
-  const { children, ...style } = props
-  return <div style={{ display: 'flex', ...style }}>{children}</div>
+  const { children, className, ...style } = props
+  return (
+    <div style={{ display: 'flex', ...style }} className={className}>
+      {children}
+    </div>
+  )
 }
 
 const LayoutGrid = (props: {
@@ -103,10 +115,16 @@ const LayoutGrid = (props: {
   alignItems: typeof layoutComponentPropTypes.LayoutGrid.alignItems.values[number]
   justifyItems: typeof layoutComponentPropTypes.LayoutGrid.justifyItems.values[number]
   gap: number
+  className?: string
+
   children?: React.ReactNode
 }) => {
-  const { children, ...style } = props
-  return <div style={{ display: 'grid', ...style }}>{children}</div>
+  const { children, className, ...style } = props
+  return (
+    <div style={{ display: 'grid', ...style }} className={className}>
+      {children}
+    </div>
+  )
 }
 
 export const layoutComponents = {
